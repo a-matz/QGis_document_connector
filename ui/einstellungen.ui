@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1111</width>
+    <height>501</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Einstellungen</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="tab_allgemein">
+      <attribute name="title">
+       <string>Allgemeine Daten</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>15</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Datenbank (*.gpkg) mit Geometriedaten wählen</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QgsFileWidget" name="file_geometrie"/>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="1" column="0">
+             <widget class="QgsMapLayerComboBox" name="combobox_haltungen"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Layer der Haltungen wählen</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_haltungen_id"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_19">
+              <property name="text">
+               <string>Attribut mit eindeutiger Bezeichnung der Haltung</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="1" column="0">
+             <widget class="QgsMapLayerComboBox" name="combobox_schacht"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Layer der Schächte wählen</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_schacht_id"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>Attribut mit eindeutiger Bezeichnung des Schachtes</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Layer der Leitungen wählen</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QgsMapLayerComboBox" name="combobox_leitung"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_leitung_id"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Attribut mit eindeutiger Bezeichnung der Leitung</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Maßstab bei Objektzoom</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="spinbox_zoom">
+              <property name="minimum">
+               <number>100</number>
+              </property>
+              <property name="maximum">
+               <number>2500</number>
+              </property>
+              <property name="value">
+               <number>500</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="title">
+             <string>Protokolle Öffnen</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Datenbank mit Verknüpfung der Inspektionsdaten (optional, falls bereits eine Datenbank erstellt wurde)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QgsFileWidget" name="file_protokolle"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_protokolle">
+      <attribute name="title">
+       <string>Details zu Dokumenten</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkbox_grossklein">
+         <property name="text">
+          <string>Groß-Kleinschreibung in  Bezeichnung ignorieren</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <layout class="QGridLayout" name="gridLayout_9">
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txt_trennzeichen">
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="combobox_datum">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Datumsformat</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupbox_haltung">
+         <property name="title">
+          <string>Haltung</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="8" column="3">
+           <widget class="QLineEdit" name="txt_l_protokoll"/>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Bezeichnung Videos</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QLineEdit" name="txt_s_typ"/>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="txt_h_protokoll"/>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Bezeichnung Dichtheitsprüfungen</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="2">
+           <widget class="QLineEdit" name="txt_s_video"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QgsFieldComboBox" name="haltung_field2"/>
+          </item>
+          <item row="9" column="2">
+           <widget class="QLineEdit" name="txt_s_dp"/>
+          </item>
+          <item row="1" column="3">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="rightMargin">
+             <number>20</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>Anzahl der Attribute über die ein Objekt identifiziert wird</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="l_radiobutton_1">
+              <property name="text">
+               <string>1</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroup_3</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radiol_radiobutton_2">
+              <property name="text">
+               <string>2</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroup_3</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="3">
+           <widget class="QgsFieldComboBox" name="leitung_field1"/>
+          </item>
+          <item row="10" column="1">
+           <widget class="QLineEdit" name="txt_h_video"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>Bezeichnung Protokolle</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Attribut 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QgsFieldComboBox" name="leitung_field2"/>
+          </item>
+          <item row="9" column="3">
+           <widget class="QLineEdit" name="txt_l_dp"/>
+          </item>
+          <item row="4" column="2">
+           <widget class="QgsFieldComboBox" name="schacht_field2"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Typ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>15</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Anzahl der Attribute über die ein Objekt identifiziert wird</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="s_radiobutton_1">
+              <property name="text">
+               <string>1</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroup</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="s_radiobutton_2">
+              <property name="text">
+               <string>2</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroup</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="6" column="3">
+           <widget class="QLineEdit" name="txt_l_typ"/>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="txt_h_typ"/>
+          </item>
+          <item row="3" column="2">
+           <widget class="QgsFieldComboBox" name="schacht_field1"/>
+          </item>
+          <item row="10" column="3">
+           <widget class="QLineEdit" name="txt_l_video"/>
+          </item>
+          <item row="1" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Anzahl der Attribute über die ein Objekt identifiziert wird</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="h_radiobutton_1">
+              <property name="text">
+               <string>1               z.B.: HaltungNr</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroup_2</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="h_radiobutton_2">
+              <property name="text">
+               <string>2               z.B.: Von-Schacht und Bis-Schacht</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroup_2</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="1">
+           <widget class="QgsFieldComboBox" name="haltung_field1"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="h_label_attribut2">
+            <property name="text">
+             <string>Attribut 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="2">
+           <widget class="QLineEdit" name="txt_s_protokoll"/>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="txt_h_dp"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_9">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Haltung</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_13">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Schacht</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_22">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Leitung</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkbox_attribut">
+         <property name="text">
+          <string>Groß-Kleinschreibung in  Attributkennung (Bsp. Nummer der Haltung) ignorieren</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <layout class="QGridLayout" name="gridLayout_8">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="3">
+          <widget class="QLabel" name="h_trenn2">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="h_attribut1">
+           <property name="lineWidth">
+            <number>0</number>
+           </property>
+           <property name="text">
+            <string>Attribut1</string>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <property name="indent">
+            <number>-1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="h_attribut2">
+           <property name="text">
+            <string>Attribut2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="9">
+          <widget class="QLabel" name="label_27">
+           <property name="text">
+            <string>.pdf</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QLabel" name="h_trenn3">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="6">
+          <widget class="QLabel" name="h_bezeichnung">
+           <property name="text">
+            <string>Bezeichnung</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="h_typ">
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="8">
+          <widget class="QLabel" name="h_datum">
+           <property name="text">
+            <string>Datum</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="h_trenn1">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="10">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="7">
+          <widget class="QLabel" name="h_trenn4">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::DefaultContextMenu</enum>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::Yes</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsFieldComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsfieldcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsFileWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsfilewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>combobox_haltungen</tabstop>
+  <tabstop>combobox_haltungen_id</tabstop>
+  <tabstop>combobox_schacht</tabstop>
+  <tabstop>combobox_schacht_id</tabstop>
+  <tabstop>combobox_leitung</tabstop>
+  <tabstop>combobox_leitung_id</tabstop>
+  <tabstop>spinbox_zoom</tabstop>
+  <tabstop>checkbox_grossklein</tabstop>
+  <tabstop>checkbox_attribut</tabstop>
+  <tabstop>txt_trennzeichen</tabstop>
+  <tabstop>combobox_datum</tabstop>
+  <tabstop>h_radiobutton_1</tabstop>
+  <tabstop>h_radiobutton_2</tabstop>
+  <tabstop>haltung_field1</tabstop>
+  <tabstop>haltung_field2</tabstop>
+  <tabstop>txt_h_typ</tabstop>
+  <tabstop>txt_h_protokoll</tabstop>
+  <tabstop>txt_h_dp</tabstop>
+  <tabstop>txt_h_video</tabstop>
+  <tabstop>s_radiobutton_1</tabstop>
+  <tabstop>s_radiobutton_2</tabstop>
+  <tabstop>schacht_field1</tabstop>
+  <tabstop>schacht_field2</tabstop>
+  <tabstop>txt_s_typ</tabstop>
+  <tabstop>txt_s_protokoll</tabstop>
+  <tabstop>txt_s_dp</tabstop>
+  <tabstop>txt_s_video</tabstop>
+  <tabstop>l_radiobutton_1</tabstop>
+  <tabstop>radiol_radiobutton_2</tabstop>
+  <tabstop>leitung_field1</tabstop>
+  <tabstop>leitung_field2</tabstop>
+  <tabstop>txt_l_typ</tabstop>
+  <tabstop>txt_l_protokoll</tabstop>
+  <tabstop>txt_l_dp</tabstop>
+  <tabstop>txt_l_video</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_3"/>
+ </buttongroups>
+</ui>

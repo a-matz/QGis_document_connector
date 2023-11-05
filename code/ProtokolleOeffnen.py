@@ -69,9 +69,6 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.haltungNr_add_completer()
         self.schachtNr_add_completer()
 
-        
-      
-
         #connectors definieren
         self.button_select_haltung.clicked.connect(lambda: self.select_object(self.layer_object["haltung"],self.variablen["attribut_haltungNr"], "Haltung"))
         self.txt_haltungNr.returnPressed.connect(lambda: self.load_layer_from_textField("Haltung"))
@@ -81,15 +78,15 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.txt_schachtNr.returnPressed.connect(lambda: self.load_layer_from_textField("Schacht"))
         self.txt_schachtNr.textEdited.connect(self.change_col_schachtNr)
 
-        self.button_tv.clicked.connect(lambda: self.open_file(self.tv_pfad[self.combobox_tv.currentIndex()]))
-        self.button_druck.clicked.connect(lambda: self.open_file(self.druck_pfad[self.combobox_druck.currentIndex()]))
-        self.button_video.clicked.connect(lambda: self.open_file(self.video_pfad[self.combobox_video.currentIndex()]))
-        self.button_tv_video.clicked.connect(lambda: self.open_file(self.tv_pfad[self.combobox_tv.currentIndex()],self.video_pfad[self.combobox_video.currentIndex()]))
+        self.button_h_protokoll.clicked.connect(lambda: self.open_file(self.tv_pfad[self.h_combobox_protokoll.currentIndex()]))
+        self.button_h_druck.clicked.connect(lambda: self.open_file(self.druck_pfad[self.h_combobox_druck.currentIndex()]))
+        self.button_h_video.clicked.connect(lambda: self.open_file(self.video_pfad[self.h_combobox_video.currentIndex()]))
+        self.button_h_protokoll_video.clicked.connect(lambda: self.open_file(self.tv_pfad[self.button_h_protokoll.currentIndex()],self.video_pfad[self.combobox_video.currentIndex()]))
         self.button_zoom_haltung.clicked.connect(lambda: self.zoom_to_object(self.layer_object["haltung"], self.features["haltung"].id()))
         
-        self.button_protokoll.clicked.connect(lambda: self.open_file(self.protokoll_pfad[self.combobox_protokoll.currentIndex()]))
-        self.button_video_schacht.clicked.connect(lambda: self.open_file(self.video_schacht_pfad[self.combobox_video_schacht.currentIndex()]))
-        self.button_schacht_alles.clicked.connect(lambda: self.open_file(self.protokoll_pfad[self.combobox_protokoll.currentIndex()],self.video_schacht_pfad[self.combobox_video_schacht.currentIndex()]))
+        self.button_s_protokoll.clicked.connect(lambda: self.open_file(self.protokoll_pfad[self.s_combobox_protokoll.currentIndex()]))
+        self.button_s_video_schacht.clicked.connect(lambda: self.open_file(self.video_schacht_pfad[self.s_combobox_video.currentIndex()]))
+        self.button_s_protokoll_video.clicked.connect(lambda: self.open_file(self.protokoll_pfad[self.s_combobox_protokoll.currentIndex()],self.video_schacht_pfad[self.s_combobox_video.currentIndex()]))
         self.button_zoom_schacht.clicked.connect(lambda: self.zoom_to_object(self.layer_object["schacht"], self.features["schacht"].id()))
 
         #wenn leitung definiert dann leitung initialisieren
@@ -176,8 +173,6 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         Definiert dictionaries mit allen nötigen attributbezeichnungen
         """
         self.setup_dict = json.loads(QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('Kanalmanagement_Setup'))
-        allg_dict = self.setup_dict["allg_einstellungen"]
-        protokolle_dict = self.setup_dict["protokolle_setup"]
         self.variablen = {}
         self.variablen["db_kanal_path"] = allg_dict["db_kanal_path"]
         self.variablen["db_sanierung_path"] = self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"]
@@ -193,18 +188,18 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.variablen["layer_protokolle_schacht"] = "Inspektionsdaten_Schacht"
         self.variablen["layer_protokolle_leitung"] = "Inspektionsdaten_Haltung"
         self.variablen["attribut_ergebnisDP"] = "ErgebnisDP"
-        self.variablen["attribut_zustandsklasse"] = "Haltungsklasse"
-        self.variablen["attribut_zustandsklasse_schacht"] = "Schachtklasse"
-        self.variablen["attribut_aktuellstesUdatum"] = "AktuellstesUDatum"
+        #self.variablen["attribut_zustandsklasse"] = "Haltungsklasse"
+        #self.variablen["attribut_zustandsklasse_schacht"] = "Schachtklasse"
+        #self.variablen["attribut_aktuellstesUdatum"] = "AktuellstesUDatum"
 
         # muss noch verbessert werden, sodass der layer eindeutig ist
         self.layer_object = {}
         #self.layer_object["haltung"] = QgsProject.instance().mapLayersByName(self.variablen["layer_haltung_name"])[0]
-        self.layer_object["haltung"] = QgsProject.instance().mapLayer(allg_dict["Haltung_layer_id"])
-        self.layer_object["schacht"] = QgsProject.instance().mapLayer(allg_dict["Schacht_layer_id"])
+        self.layer_object["haltung"] = QgsProject.instance().mapLayer(allg_dict["Haltung_layer_id"]).clone()
+        self.layer_object["schacht"] = QgsProject.instance().mapLayer(allg_dict["Schacht_layer_id"]).clone()
         #leitung kann aber muss nicht definiert sein
         try:
-            self.layer_object["leitung"] = QgsProject.instance().mapLayer(allg_dict["Leitung_layer_id"])
+            self.layer_object["leitung"] = QgsProject.instance().mapLayer(allg_dict["Leitung_layer_id"]).clone()
             self.leitung_defined = True
         except:
             self.leitung_defined = False
@@ -326,18 +321,18 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
             self.txt_ergebnisDP.setText(ergebnisDP)
             self.change_col_ergebnisDP()
 
-            zustandsklasse = str(self.features["haltung"].attribute(self.variablen["attribut_zustandsklasse"]))
-            if zustandsklasse == "NULL":
-                zustandsklasse = "-"
+            #zustandsklasse = str(self.features["haltung"].attribute(self.variablen["attribut_zustandsklasse"]))
+            #if zustandsklasse == "NULL":
+            #    zustandsklasse = "-"
             self.load_haltung.emit()
         elif object_type == "Schacht":
             if not load_from_txt_field:
                 self.txt_schachtNr.setText(self.features["schacht"].attribute(self.variablen["attribut_schachtNr"]))
             self.change_col_schachtNr(text = "", valid = True)        
 
-            zustandsklasse = str(self.features["schacht"].attribute(self.variablen["attribut_zustandsklasse_schacht"]))
-            if zustandsklasse == "NULL":
-                zustandsklasse = "-"
+           # zustandsklasse = str(self.features["schacht"].attribute(self.variablen["attribut_zustandsklasse_schacht"]))
+           # if zustandsklasse == "NULL":
+           #     zustandsklasse = "-"
             self.load_schacht.emit()
         if object_type == "Leitung":            
             if not load_from_txt_field:
@@ -355,18 +350,8 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
 
             #self.load_leitung.emit()
 
-        """self.txt_zustandsklasse.setText(zustandsklasse)
-        self.Udatum = self.features["haltung"].attribute(self.variablen["attribut_aktuellstesUdatum"])
-        try:
-            self.Udatum = self.Udatum.toString("dd.MM.yyyy")
-        except:
-            self.Udatum = "-"
-        self.txt_aktuellstesUdatum.setText(self.Udatum)
-        """
-        
         self.load_protokolle(object_type)
-        
-  
+ 
     def clear_all(self):
         # Haltung Tab
         self.combobox_tv.clear()
@@ -412,7 +397,7 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         layer.selectByIds([id], QgsVectorLayer.SetSelection)
         bbox = layer.boundingBoxOfSelected()
         self.iface.mapCanvas().setExtent(bbox)
-        scale = self.setup_dict["allg_einstellungen"]["zoom_massstab"]
+        scale = self.setup_dict["zoom_massstab"]
         self.iface.mapCanvas().zoomScale(scale)
         self.iface.mapCanvas().refresh()
 
@@ -450,10 +435,6 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                     else:
                         self.druck_datum.append("1900-01-01 00:00:00")
 
-            """self.tv_datum_strp = [datetime.strptime(i, "%Y-%m-%d %H:%M:%S") for i in self.tv_datum]
-            self.video_datum_strp = [datetime.strptime(i, "%Y-%m-%d %H:%M:%S") for i in self.video_datum]
-            self.druck_datum_strp = [datetime.strptime(i, "%Y-%m-%d %H:%M:%S") for i in self.druck_datum]"""
-            
             self.tv_datum_strp = self.tv_datum
             self.video_datum_strp = self.video_datum
             self.druck_datum_strp = self.druck_datum
@@ -738,482 +719,3 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
             self.txt_ergebnisDP_leitung.setStyleSheet("QLabel {background-color: orange;}")
         else:
             self.txt_ergebnisDP_leitung.setStyleSheet("")
-    
-    def update_attribute_in_layer(self,typ, layer_name, attribute, value):
-        """
-        Mit dieser Funktion Werden Attribute eines beliebigen layers aktualisiert. Das Feature wird
-        auf Basis des aktuellen features in self.features["schacht"] oder self.features["haltung"] identifiziert.
-        typ = Haltung oder Schacht
-        layer_name = Name des Layers der geändert werden soll
-        attribute = zu änderndes Attribut
-        value = neuer wert
-        """
-        fehler = False
-        san_db = self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"]
-        layer = QgsVectorLayer(san_db + f"|layername={layer_name}", layer_name, "ogr")
-        if typ == "Haltung":
-            if "haltung" in self.features.keys():
-                layer.setSubsetString(f"HaltungNr = '{self.features['haltung'].attribute(self.variablen['attribut_haltungNr'])}'")
-                # neues objekt einfügen
-                if layer.featureCount() == 0: 
-                    feat = QgsFeature()
-                    feat.setFields(layer.fields())
-                    feat.setAttribute("HaltungNr", self.features['haltung'].attribute(self.variablen['attribut_haltungNr']))
-                    feat.setAttribute("Datum_Bearbeitung", QDateTime(datetime.now()))
-                    feat.setAttribute(attribute, value)
-
-
-                    line = list()
-                    for vertex in self.features['haltung'].geometry().asMultiPolyline()[0]:
-                        line.append(QgsPoint(vertex.x(), vertex.y()))
-                    polyline = QgsGeometry.fromPolyline(line) 
-                    feat.setGeometry(polyline)
-
-                    with edit(layer):
-                        layer.addFeature(feat)
-                else:
-                    idx = layer.fields().indexOf(attribute)
-                    idx_date = layer.fields().indexOf("Datum_Bearbeitung")
-                    change_feat = QgsFeature()
-                    layer.getFeatures().nextFeature(change_feat)
-                    fid =change_feat.id()
-                    with edit(layer):
-                        layer.changeAttributeValue(fid,idx,value)
-                        layer.changeAttributeValue(fid,idx_date,QDateTime(datetime.now()))
-            else:
-                fehler = True
-            self.update_sanierungskonzept_haltung_listWidget()
-            try:
-                self.layer_object["haltung_sanierungskonzept"].triggerRepaint()
-            except:
-                pass
-        elif typ == "Schacht":
-            if "schacht" in self.features.keys():
-                layer.setSubsetString(f"SchachtNr = '{self.features['schacht'].attribute(self.variablen['attribut_schachtNr'])}'")
-                # neues objekt einfügen
-                if layer.featureCount() == 0: 
-                    feat = QgsFeature()
-                    feat.setFields(layer.fields())
-                    feat.setAttribute("SchachtNr", self.features['schacht'].attribute(self.variablen['attribut_schachtNr']))
-                    feat.setAttribute("Datum_Bearbeitung", QDateTime(datetime.now()))
-                    feat.setAttribute(attribute, value)
-
-                    feat.setGeometry(self.features['schacht'].geometry())
-                    #print(self.features['schacht'].attribute("SchachtNr"))
-                    with edit(layer):
-                        layer.addFeature(feat)
-                else:
-                    idx = layer.fields().indexOf(attribute)
-                    idx_date = layer.fields().indexOf("Datum_Bearbeitung")
-                    change_feat = QgsFeature()
-                    layer.getFeatures().nextFeature(change_feat)
-                    fid =change_feat.id()
-                    with edit(layer):
-                        layer.changeAttributeValue(fid,idx,value)
-                        layer.changeAttributeValue(fid,idx_date,QDateTime(datetime.now()))
-            else:
-                fehler = True
-            self.update_sanierungskonzept_schacht_listWidget()
-            try:
-                self.layer_object["schacht_sanierungskonzept"].triggerRepaint()
-            except:
-                pass
-        else:
-            fehler = True
-        if fehler:
-            QMessageBox.warning(self,"Fehler!","Objekt konnte nicht erzeugt werden.")
-
-
-    def setup_sanierungskonzept(self):
-        #leitungen werden nicht dargestellt
-        self.tab_defined = False
-        try:
-            self.tabWidget.removeTab(2)
-        except:
-            pass
-        #sep steht als platzhalter für die horizonatle linie
-        auswahl_list = ["keine Maßnahme","sep","Sofortmaßnahme","sep",
-        "Renovierung kurzfristig","Renovierung mittelfristig", "Renovierung langfristig","sep",
-        "Reparatur kurzfristig","Reparatur mittelfristig", "Reparatur langfristig","sep",
-        "Neubau kurzfristig","Neubau mittelfristig", "Neubau langfristig","sep",
-        "potenzielle Sofortmaßnahme","sep","laufende Bearbeitung","sep", ""]
-        self.auswahl_dict = {}
-        self.combobox_separator = []
-        for i, element in enumerate(auswahl_list):
-            if element != "sep":
-                self.auswahl_dict[element] = i
-            else: 
-                self.combobox_separator.append(i)
-        
-        filter = ["sep","potenzielle Sofortmaßnahme","sep","Sofortmaßnahme","sep","kurzfristig","mittelfristig","langfristig","sep","Renovierung", "Reparatur","Neubau","sep","keine Maßnahme","sep","laufende Bearbeitung"]
-        self.combobox_filter_schacht_list =  ["alle Schächte"] + filter
-        self.combobox_filter_haltung_list = ["alle Haltungen"] + filter
-        
-        try:
-            self.layer_object["haltung_sanierungskonzept"] = QgsProject.instance().mapLayersByName("Sanierungskonzept_Haltung")[0]
-        except:
-            pass
-        try:
-            self.layer_object["schacht_sanierungskonzept"] = QgsProject.instance().mapLayersByName("Sanierungskonzept_Schacht")[0]
-        except:
-            pass
-
-        self.setup_sanierungskonzept_haltung()
-        self.setup_sanierungskonzept_schacht()
-
-        self.setWindowTitle("Sanierungskonzept")
-
-    def setup_sanierungskonzept_haltung(self):
-        self.load_haltung.connect(self.update_sanierungskonzept_haltung)
-        self.combobox_konzept_haltung = QComboBox()
-        self.combobox_konzept_haltung.addItems(self.auswahl_dict.keys())
-        
-        for sep in self.combobox_separator:    
-            self.combobox_konzept_haltung.insertSeparator(sep)
-
-        with QSignalBlocker(self.combobox_konzept_haltung):
-            self.combobox_konzept_haltung.setCurrentIndex(-1)
-        self.combobox_konzept_haltung.currentIndexChanged.connect(lambda: self.update_attribute_in_layer("Haltung", "Haltung_Sanierungskonzept", "Sanierungskonzept", self.combobox_konzept_haltung.currentText()))
-        self.grid_haltung.addWidget(QLabel("Sanierungskonzept:"),5,0,1,2)
-        self.grid_haltung.addWidget(self.combobox_konzept_haltung,5,2,1,2)
-
-        """self.txt_konzept_menge_haltung = QLineEdit()
-        self.txt_konzept_menge_haltung.setPlaceholderText("Menge")
-        reg_ex_menge = QRegExp("^\d{1,3}\.\d{1}|^\d{1,3}")
-        input_validator_menge = QRegExpValidator(reg_ex_menge, self.txt_konzept_menge_haltung)
-        self.txt_konzept_menge_haltung.setValidator(input_validator_menge)
-        self.grid_haltung.addWidget(self.txt_konzept_menge_haltung,5,4,1,2)
-        self.txt_konzept_menge_haltung.textEdited.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_menge_haltung, valid = False))
-        self.txt_konzept_menge_haltung.editingFinished.connect(lambda: self.update_attribute_in_layer("Haltung", "Haltung_Sanierungskonzept", "Menge", float(self.txt_konzept_menge_haltung.text())))
-        self.txt_konzept_menge_haltung.editingFinished.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_menge_haltung, valid = True))"""
-
-        self.txt_konzept_klasse_haltung = QLineEdit()
-        self.txt_konzept_klasse_haltung.setPlaceholderText("man. Zustandskl.")
-        reg_ex_klasse = QRegExp("^[0-5]$")
-        input_validator_klasse = QRegExpValidator(reg_ex_klasse, self.txt_konzept_klasse_haltung)
-        self.txt_konzept_klasse_haltung.setValidator(input_validator_klasse)
-        self.grid_haltung.addWidget(self.txt_konzept_klasse_haltung,5,4,1,2)
-        self.txt_konzept_klasse_haltung.textEdited.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_klasse_haltung, valid = False))
-        self.txt_konzept_klasse_haltung.editingFinished.connect(lambda: self.update_attribute_in_layer("Haltung", "Haltung_Sanierungskonzept", "Haltungsklasse_manuell", float(self.txt_konzept_klasse_haltung.text())))
-        self.txt_konzept_klasse_haltung.editingFinished.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_klasse_haltung, valid = True))
-
-        hbox = QHBoxLayout()
-        self.checkbox_zoom_haltung = QCheckBox()
-        self.checkbox_zoom_haltung.setChecked(True)
-        hbox.addWidget(self.checkbox_zoom_haltung,0)
-        hbox.addWidget(QLabel("  bei Laden zum Objekt Zoomen"),1)
-        self.grid_haltung.addLayout(hbox,5,6,1,2)
-        
-        self.txt_konzept_haltung_kommentar = QLineEdit()
-        self.grid_haltung.addWidget(QLabel("Kommentar:"),6,0,1,2)
-        self.grid_haltung.addWidget(self.txt_konzept_haltung_kommentar,6,2,1,6)
-        self.txt_konzept_haltung_kommentar.textEdited.connect(self.change_col_konzept_haltung_kommentar)
-        self.txt_konzept_haltung_kommentar.editingFinished.connect((lambda: self.update_attribute_in_layer("Haltung", "Haltung_Sanierungskonzept", "Kommentar", self.txt_konzept_haltung_kommentar.text())))
-        self.txt_konzept_haltung_kommentar.editingFinished.connect(lambda: self.change_col_konzept_haltung_kommentar(text = "", valid = True))
-
-        #self.txt_konzept_menge_haltung.setEnabled(False)
-        self.txt_konzept_klasse_haltung.setEnabled(False)
-        self.combobox_konzept_haltung.setEnabled(False)
-        self.txt_konzept_haltung_kommentar.setEnabled(False)
-
-        self.sanierungskonzept_haltung_list = QListWidget()
-        self.grid_haltung.addWidget(self.sanierungskonzept_haltung_list,7,2,4,5)
-        self.sanierungskonzept_haltung_list.itemDoubleClicked.connect(self.sanierungskonzept_haltung_item_clicked)
-
-        self.combobox_filter_haltung = QComboBox()
-        self.combobox_filter_haltung.setMaximumWidth(150)
-        for i, element in enumerate(self.combobox_filter_haltung_list):
-            if element != "sep":
-                self.combobox_filter_haltung.addItem(element)
-            else:
-                self.combobox_filter_haltung.insertSeparator(i)
-        self.grid_haltung.addWidget(self.combobox_filter_haltung,7,7,1,1)
-        self.combobox_filter_haltung.currentIndexChanged.connect(self.update_sanierungskonzept_haltung_listWidget)
-
-        self.button_delete_haltung = QPushButton("Haltung entfernen")
-        self.grid_haltung.addWidget(self.button_delete_haltung,8,7,1,1)
-        self.button_delete_haltung.clicked.connect(lambda: self.delete_object("Haltung", "Haltung_Sanierungskonzept"))
-        
-        self.button_load_layer = QPushButton("Layer mit Maßnahmen laden")
-        self.grid_haltung.addWidget(self.button_load_layer,9,7,1,1)
-        self.button_load_layer.clicked.connect(self.load_massnahmen_layer_to_canvas)
-        
-        self.update_sanierungskonzept_haltung_listWidget()
-
-    def change_col_konzept_haltung_kommentar(self,text,valid=None):
-        if valid != None:
-            self.txt_konzept_haltung_kommentar.setStyleSheet("")
-        else:
-            self.txt_konzept_haltung_kommentar.setStyleSheet("QLineEdit::editable {background-color: orange;}")
-    
-    def update_sanierungskonzept_haltung(self):
-        self.combobox_konzept_haltung.setEnabled(True)
-        self.txt_konzept_haltung_kommentar.setEnabled(True)
-        #self.txt_konzept_menge_haltung.setEnabled(True)
-        self.txt_konzept_klasse_haltung.setEnabled(True)
-
-        con = sqlite3.connect(self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"])
-        haltung = pd.read_sql_query(f"SELECT * from Haltung_Sanierungskonzept WHERE HaltungNr = '{self.txt_haltungNr.text()}'",con)
-        con.close()
-
-        if len(haltung) > 0:
-            with QSignalBlocker(self.txt_konzept_haltung_kommentar):
-                self.txt_konzept_haltung_kommentar.setText(haltung.Kommentar.tolist()[0])
-            with QSignalBlocker(self.combobox_konzept_haltung):
-                if haltung.Sanierungskonzept.tolist()[0] != None:
-                    self.combobox_konzept_haltung.setCurrentIndex(self.auswahl_dict[haltung.Sanierungskonzept.tolist()[0]])
-                else:
-                    self.combobox_konzept_haltung.setCurrentIndex(-1)
-            """with QSignalBlocker(self.txt_konzept_menge_haltung):
-                if haltung.Menge.tolist()[0] == "" or haltung.Menge.tolist()[0] == None:
-                    self.txt_konzept_menge_haltung.setText("")
-                else:
-                    self.txt_konzept_menge_haltung.setText(str(haltung.Menge.tolist()[0]))"""
-
-            with QSignalBlocker(self.txt_konzept_klasse_haltung):
-                if haltung.Haltungsklasse_manuell.tolist()[0] == "" or haltung.Haltungsklasse_manuell.tolist()[0] == None:
-                    self.txt_konzept_klasse_haltung.setText("")
-                else:
-                    self.txt_konzept_klasse_haltung.setText(str(haltung.Haltungsklasse_manuell.tolist()[0]))
-        else:
-            with QSignalBlocker(self.txt_konzept_haltung_kommentar):
-                self.txt_konzept_haltung_kommentar.setText("")
-            with QSignalBlocker(self.combobox_konzept_haltung):
-                self.combobox_konzept_haltung.setCurrentIndex(-1)
-            #with QSignalBlocker(self.txt_konzept_menge_haltung):
-            #    self.txt_konzept_menge_haltung.setText("")
-            with QSignalBlocker(self.txt_konzept_klasse_haltung):
-                self.txt_konzept_klasse_haltung.setText("")
-        
-    def update_sanierungskonzept_haltung_listWidget(self):
-        self.sanierungskonzept_haltung_list.clear()
-        sql_query = "SELECT * FROM Haltung_Sanierungskonzept"
-        filter = self.combobox_filter_haltung.currentText()
-        if filter != "alle Haltungen":
-            if filter in ["Sofortmaßnahme","potenzielle Sofortmaßnahme"]:
-                sql_query = sql_query + f" WHERE Sanierungskonzept = '{filter}'"
-            else:
-                sql_query = sql_query + f" WHERE Sanierungskonzept like '%{filter}%'"
-        
-        con = sqlite3.connect(self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"])
-        haltung_df = pd.read_sql_query(sql_query,con)
-        con.close()
-
-        for idx, haltung in haltung_df.iterrows():
-            txt = f"{haltung.HaltungNr}:"
-            if haltung.Sanierungskonzept != "" and haltung.Sanierungskonzept != None:
-                txt = f"{txt} {haltung.Sanierungskonzept}"
-            if haltung.Kommentar != "" and haltung.Kommentar != None:
-                txt = f"{txt} - {haltung.Kommentar}" 
-            item = QListWidgetItem(txt)
-            item.nr = haltung.HaltungNr
-            item.id = haltung.fid
-            self.sanierungskonzept_haltung_list.addItem(item)
-
-    def sanierungskonzept_haltung_item_clicked(self,item):
-        self.txt_haltungNr.setText(item.nr)
-        self.load_layer_from_textField(object_type = "Haltung")
-        if self.checkbox_zoom_haltung.isChecked():
-            self.zoom_to_object(self.layer_object["haltung"], self.features["haltung"].id())
-    
-    def setup_sanierungskonzept_schacht(self):
-        self.load_schacht.connect(self.update_sanierungskonzept_schacht)
-        self.combobox_konzept_schacht = QComboBox()
-        self.combobox_konzept_schacht.addItems(self.auswahl_dict.keys())
-        for sep in self.combobox_separator:    
-            self.combobox_konzept_schacht.insertSeparator(sep)
-
-        with QSignalBlocker(self.combobox_konzept_schacht):
-            self.combobox_konzept_schacht.setCurrentIndex(-1)
-        self.combobox_konzept_schacht.currentIndexChanged.connect(lambda: self.update_attribute_in_layer("Schacht", "Schacht_Sanierungskonzept", "Sanierungskonzept", self.combobox_konzept_schacht.currentText()))
-        self.grid_schacht.addWidget(QLabel("Sanierungskonzept:"),4,0,1,2)
-        self.grid_schacht.addWidget(self.combobox_konzept_schacht,4,2,1,1)
-
-        """self.txt_konzept_menge_schacht = QLineEdit()
-        self.txt_konzept_menge_schacht.setPlaceholderText("Menge")
-        reg_ex_menge = QRegExp("^\d{1,3}\.\d{1}|^\d{1,3}")
-        input_validator_menge = QRegExpValidator(reg_ex_menge, self.txt_konzept_menge_schacht)
-        self.txt_konzept_menge_schacht.setValidator(input_validator_menge)
-        self.grid_schacht.addWidget(self.txt_konzept_menge_schacht,4,3,1,1)
-        self.txt_konzept_menge_schacht.textEdited.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_menge_schacht, valid = False))
-        self.txt_konzept_menge_schacht.editingFinished.connect(lambda: self.update_attribute_in_layer("Schacht", "Schacht_Sanierungskonzept", "Menge", float(self.txt_konzept_menge_schacht.text())))
-        self.txt_konzept_menge_schacht.editingFinished.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_menge_schacht, valid = True))"""
-
-        self.txt_konzept_klasse_schacht = QLineEdit()
-        self.txt_konzept_klasse_schacht.setPlaceholderText("man. Zustandskl.")
-        reg_ex_klasse = QRegExp("^[0-5]$")
-        input_validator_klasse = QRegExpValidator(reg_ex_klasse, self.txt_konzept_klasse_schacht)
-        self.txt_konzept_klasse_schacht.setValidator(input_validator_klasse)
-        self.grid_schacht.addWidget(self.txt_konzept_klasse_schacht,4,3,1,1)
-        self.txt_konzept_klasse_schacht.textEdited.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_klasse_schacht, valid = False))
-        self.txt_konzept_klasse_schacht.editingFinished.connect(lambda: self.update_attribute_in_layer("Schacht", "Schacht_Sanierungskonzept", "Schachtklasse_manuell", float(self.txt_konzept_klasse_schacht.text())))
-        self.txt_konzept_klasse_schacht.editingFinished.connect(lambda: self.change_col_lineedit(text = "",widget = self.txt_konzept_klasse_schacht, valid = True))
-
-        hbox = QHBoxLayout()
-        self.checkbox_zoom_schacht = QCheckBox()
-        self.checkbox_zoom_schacht.setChecked(True)
-        hbox.addWidget(self.checkbox_zoom_schacht,0)
-        hbox.addWidget(QLabel("  bei Laden zum Objekt Zoomen"),1)
-        self.grid_schacht.addLayout(hbox,4,4,1,2)
-
-        self.txt_konzept_schacht_kommentar = QLineEdit()
-        self.grid_schacht.addWidget(QLabel("Kommentar:"),5,0,1,2)
-        self.grid_schacht.addWidget(self.txt_konzept_schacht_kommentar,5,2,1,4)
-        self.txt_konzept_schacht_kommentar.textEdited.connect(self.change_col_konzept_schacht_kommentar)
-        self.txt_konzept_schacht_kommentar.editingFinished.connect((lambda: self.update_attribute_in_layer("Schacht", "Schacht_Sanierungskonzept", "Kommentar", self.txt_konzept_schacht_kommentar.text())))
-        self.txt_konzept_schacht_kommentar.editingFinished.connect(lambda: self.change_col_konzept_schacht_kommentar(text = "", valid = True))
-
-        self.combobox_konzept_schacht.setEnabled(False)
-        self.txt_konzept_schacht_kommentar.setEnabled(False)
-
-        self.sanierungskonzept_schacht_list = QListWidget()
-        self.grid_schacht.addWidget(self.sanierungskonzept_schacht_list,6,2,3,3)
-        self.sanierungskonzept_schacht_list.itemDoubleClicked.connect(self.sanierungskonzept_schacht_item_clicked)
-
-        self.combobox_filter_schacht = QComboBox()
-        self.combobox_filter_schacht.setMaximumWidth(150)
-        for i, element in enumerate(self.combobox_filter_schacht_list):
-            if element != "sep":
-                self.combobox_filter_schacht.addItem(element)
-            else:
-                self.combobox_filter_schacht.insertSeparator(i)
-        self.grid_schacht.addWidget(self.combobox_filter_schacht,6,5,1,1)
-        self.combobox_filter_schacht.currentIndexChanged.connect(self.update_sanierungskonzept_schacht_listWidget)
-
-        self.button_delete_schacht = QPushButton("Schacht entfernen")
-        self.grid_schacht.addWidget(self.button_delete_schacht,7,5,1,1)
-        self.button_delete_schacht.clicked.connect(lambda: self.delete_object("Schacht", "Schacht_Sanierungskonzept"))
-
-        self.update_sanierungskonzept_schacht_listWidget()
-
-    def change_col_lineedit(self,text,widget,valid):
-        if valid:
-            widget.setStyleSheet("")
-        else:
-            widget.setStyleSheet("QLineEdit::editable {background-color: orange;}")
-
-    def change_col_konzept_schacht_kommentar(self,text,valid=None):
-        if valid != None:
-            self.txt_konzept_schacht_kommentar.setStyleSheet("")
-        else:
-            self.txt_konzept_schacht_kommentar.setStyleSheet("QLineEdit::editable {background-color: orange;}")
-    
-    def update_sanierungskonzept_schacht(self):
-        self.combobox_konzept_schacht.setEnabled(True)
-        self.txt_konzept_schacht_kommentar.setEnabled(True)
-        #self.txt_konzept_menge_schacht.setEnabled(True)
-        self.txt_konzept_klasse_schacht.setEnabled(True)
-
-        con = sqlite3.connect(self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"])
-        schacht = pd.read_sql_query(f"SELECT * from Schacht_Sanierungskonzept WHERE SchachtNr = '{self.txt_schachtNr.text()}'",con)
-        con.close()
-
-        if len(schacht) > 0:
-            with QSignalBlocker(self.txt_konzept_schacht_kommentar):
-                self.txt_konzept_schacht_kommentar.setText(schacht.Kommentar.tolist()[0])
-            with QSignalBlocker(self.combobox_konzept_schacht):
-                if schacht.Sanierungskonzept.tolist()[0] != None:
-                    self.combobox_konzept_schacht.setCurrentIndex(self.auswahl_dict[schacht.Sanierungskonzept.tolist()[0]])
-                else:
-                    self.combobox_konzept_schacht.setCurrentIndex(-1)
-            """with QSignalBlocker(self.txt_konzept_menge_schacht):
-                if schacht.Menge.tolist()[0] == "" or schacht.Menge.tolist()[0] == None:
-                    self.txt_konzept_menge_schacht.setText("")
-                else:
-                    self.txt_konzept_menge_schacht.setText(str(schacht.Menge.tolist()[0]))"""
-            with QSignalBlocker(self.txt_konzept_klasse_schacht):
-                if schacht.Schachtklasse_manuell.tolist()[0] == "" or schacht.Schachtklasse_manuell.tolist()[0] == None:
-                    self.txt_konzept_klasse_schacht.setText("")
-                else:
-                    self.txt_konzept_klasse_schacht.setText(str(schacht.Schachtklasse_manuell.tolist()[0]))
-        else:
-            with QSignalBlocker(self.txt_konzept_schacht_kommentar):
-                self.txt_konzept_schacht_kommentar.setText("")
-            with QSignalBlocker(self.combobox_konzept_schacht):
-                self.combobox_konzept_schacht.setCurrentIndex(-1)
-            with QSignalBlocker(self.txt_konzept_klasse_schacht):
-                self.txt_konzept_klasse_schacht.setText("")
-        
-    def update_sanierungskonzept_schacht_listWidget(self):
-        self.sanierungskonzept_schacht_list.clear()
-        sql_query = "SELECT * FROM Schacht_Sanierungskonzept"
-        filter = self.combobox_filter_schacht.currentText()
-        if filter != "alle Schächte":
-            if filter in ["Sofortmaßnahme", "potenzielle Sofortmaßnahme"]:
-                sql_query = sql_query + f" WHERE Sanierungskonzept = '{filter}'"
-            else:
-                sql_query = sql_query + f" WHERE Sanierungskonzept like '%{filter}%'"
-        
-        con = sqlite3.connect(self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"])
-        schacht_df = pd.read_sql_query(sql_query,con)
-        con.close()
-
-        for idx, schacht in schacht_df.iterrows():
-            txt = f"{schacht.SchachtNr}:"
-            if schacht.Sanierungskonzept != "" and schacht.Sanierungskonzept != None:
-                txt = f"{txt} {schacht.Sanierungskonzept}"
-            if schacht.Kommentar != "" and schacht.Kommentar != None:
-                txt = f"{txt} - {schacht.Kommentar}" 
-            item = QListWidgetItem(txt)
-            item.nr = schacht.SchachtNr
-            item.id = schacht.fid
-            self.sanierungskonzept_schacht_list.addItem(item)
-
-    def sanierungskonzept_schacht_item_clicked(self,item):
-        self.txt_schachtNr.setText(item.nr)
-        self.load_layer_from_textField(object_type = "Schacht")
-        if self.checkbox_zoom_schacht.isChecked():
-            self.zoom_to_object(self.layer_object["schacht"], self.features["schacht"].id())
-
-    def delete_object(self,typ, layer_name):
-        san_db = self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"]
-        layer = QgsVectorLayer(san_db + f"|layername={layer_name}", layer_name, "ogr")
-        if typ == "Haltung":
-            if len(self.sanierungskonzept_haltung_list.selectedItems()) > 0:
-                item = self.sanierungskonzept_haltung_list.selectedItems()[0]
-                fortfahren =QMessageBox.warning(self,"Haltung entfernen",f"Soll die Haltung <b>{item.nr}</b> aus der Liste entfernt werden?", QMessageBox.Yes|QMessageBox.No)
-                if fortfahren == QMessageBox.Yes:
-                    with edit(layer):
-                        layer.deleteFeature(item.id)
-                    self.update_sanierungskonzept_haltung_listWidget()
-                    with QSignalBlocker(self.combobox_konzept_haltung):
-                        self.combobox_konzept_haltung.setCurrentIndex(-1)
-                    with QSignalBlocker(self.txt_konzept_haltung_kommentar):
-                        self.txt_konzept_haltung_kommentar.setText("")
-            try:
-                self.layer_object["haltung_sanierungskonzept"].triggerRepaint()
-            except:
-                pass
-        elif typ == "Schacht":
-            if len(self.sanierungskonzept_schacht_list.selectedItems()) > 0:
-                item = self.sanierungskonzept_schacht_list.selectedItems()[0]
-                fortfahren =QMessageBox.warning(self,"Schacht entfernen",f"Soll der Schacht <b>{item.nr}</b> aus der Liste entfernt werden?", QMessageBox.Yes|QMessageBox.No)
-                if fortfahren == QMessageBox.Yes:
-                    with edit(layer):
-                        layer.deleteFeature(item.id)
-                    self.update_sanierungskonzept_schacht_listWidget()
-                    with QSignalBlocker(self.combobox_konzept_schacht):
-                        self.combobox_konzept_schacht.setCurrentIndex(-1)
-                    with QSignalBlocker(self.txt_konzept_schacht_kommentar):
-                        self.txt_konzept_schacht_kommentar.setText("")
-            try:
-                self.layer_object["schacht_sanierungskonzept"].triggerRepaint()
-            except:
-                pass
-
-    def load_massnahmen_layer_to_canvas(self):
-        root = QgsProject.instance().layerTreeRoot()
-        if root.findGroup("Sanierungskonzept") == None:
-            self.layer_object["haltung_sanierungskonzept"] = QgsVectorLayer(self.variablen["db_sanierung_path"]+"|layername=Haltung_Sanierungskonzept","Sanierungskonzept_Haltung","ogr")
-            self.layer_object["schacht_sanierungskonzept"] = QgsVectorLayer(self.variablen["db_sanierung_path"]+"|layername=Schacht_Sanierungskonzept","Sanierungskonzept_Schacht","ogr")
-            QgsProject.instance().addMapLayer(self.layer_object["haltung_sanierungskonzept"],False)
-            QgsProject.instance().addMapLayer(self.layer_object["schacht_sanierungskonzept"],False)
-            qml_haltung = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","Layerstile","Haltung_Sanierungskonzept.qml"))
-            qml_schacht = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","Layerstile","Schacht_Sanierungskonzept.qml"))
-            self.layer_object["haltung_sanierungskonzept"].loadNamedStyle(qml_haltung)
-            self.layer_object["schacht_sanierungskonzept"].loadNamedStyle(qml_schacht)
-            
-            group = root.insertGroup(0,"Sanierungskonzept")
-            group.addLayer(self.layer_object["schacht_sanierungskonzept"])
-            group.addLayer(self.layer_object["haltung_sanierungskonzept"])
-

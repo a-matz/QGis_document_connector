@@ -100,6 +100,9 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
             #set layer combobox attribute
             self.haltung_field1.setLayer(layer)
             self.haltung_field2.setLayer(layer)
+            self.combobox_haltungen_dp.setLayer(layer)
+            if "ErgebnisDP" in self.combobox_haltungen_dp.fields().names():
+                self.combobox_haltungen_dp.setField("ErgebnisDP")
 
             if "HaltungNr" in self.haltung_field1.fields().names():
                 self.haltung_field1.setField("HaltungNr")
@@ -112,6 +115,9 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
             #set layer combobox attribute
             self.schacht_field1.setLayer(layer)
             self.schacht_field2.setLayer(layer)
+            self.combobox_schacht_dp.setLayer(layer)
+            if "ErgebnisDP" in self.combobox_schacht_dp.fields().names():
+                self.combobox_schacht_dp.setField("ErgebnisDP")
 
             if "SchachtNr" in self.schacht_field1.fields().names():
                 self.schacht_field1.setField("SchachtNr")
@@ -123,6 +129,9 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
             #set layer combobox attribute
             self.leitung_field1.setLayer(layer)
             self.leitung_field2.setLayer(layer)
+            self.combobox_leitung_dp.setLayer(layer)
+            if "ErgebnisDP" in self.combobox_leitung_dp.fields().names():
+                self.combobox_leitung_dp.setField("ErgebnisDP")
 
             if "LeitungNr" in self.leitung_field1.fields().names():
                 self.leitung_field1.setField("LeitungNr")
@@ -227,8 +236,11 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
                             self.haltung_field1.setLayer(self.combobox_haltungen.currentLayer())
                             self.combobox_haltungen_id.setLayer(self.combobox_haltungen.currentLayer())
                             self.haltung_field2.setLayer(self.combobox_haltungen.currentLayer())
+                            self.combobox_haltungen_dp.setLayer(self.combobox_haltungen.currentLayer())
 
                             self.combobox_haltungen_id.setCurrentText(typ_dict["attribut_id"])
+                            if typ_dict["ergebnis_dp"] != "":
+                                self.combobox_haltungen_dp.setCurrentText(typ_dict["ergebnis_dp"])
                             self.haltung_field1.setCurrentText(typ_dict["attribut1"])
                             if "attribut2" in typ_dict.keys():
                                 self.haltung_field2.setCurrentText(typ_dict["attribut2"])
@@ -261,8 +273,11 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
                             self.schacht_field1.setLayer(self.combobox_schacht.currentLayer())
                             self.combobox_schacht_id.setLayer(self.combobox_schacht.currentLayer())
                             self.schacht_field2.setLayer(self.combobox_schacht.currentLayer())
+                            self.combobox_schacht_dp.setLayer(self.combobox_schacht.currentLayer())
 
                             self.combobox_schacht_id.setCurrentText(typ_dict["attribut_id"])
+                            if typ_dict["ergebnis_dp"] != "":
+                                self.combobox_schacht_dp.setCurrentText(typ_dict["ergebnis_dp"])
                             self.schacht_field1.setCurrentText(typ_dict["attribut1"])
                             if "attribut2" in typ_dict.keys():
                                 self.schacht_field2.setCurrentText(typ_dict["attribut2"])
@@ -294,9 +309,12 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
                         if layer_found:
                             self.leitung_field1.setLayer(self.combobox_leitung.currentLayer())
                             self.combobox_leitung_id.setLayer(self.combobox_leitung.currentLayer())
+                            self.combobox_leitung_dp.setLayer(self.combobox_leitung.currentLayer())
                             self.leitung_field2.setLayer(self.combobox_leitung.currentLayer())
 
                             self.combobox_leitung_id.setCurrentText(typ_dict["attribut_id"])
+                            if typ_dict["ergebnis_dp"] != "":
+                                self.combobox_leitung_dp.setCurrentText(typ_dict["ergebnis_dp"])
                             self.leitung_field1.setCurrentText(typ_dict["attribut1"])
                             if "attribut2" in typ_dict.keys():
                                 self.leitung_field2.setCurrentText(typ_dict["attribut2"])
@@ -358,6 +376,7 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["haltung"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_h_dp.text().split(";")]
         self.setup_dict["haltung"]["bezeichnung_video"] = [txt.strip() for txt in self.txt_h_video.text().split(";")]
         self.setup_dict["haltung"]["1_attribut"] = self.h_radiobutton_1.isChecked()
+        self.setup_dict["haltung"]["ergebnis_dp"] = self.combobox_haltungen_dp.currentField()
 
         #settings for schacht
         if self.combobox_schacht.currentIndex() != -1:
@@ -373,6 +392,7 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["schacht"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_s_dp.text().split(";")]
         self.setup_dict["schacht"]["bezeichnung_video"] = [txt.strip() for txt in self.txt_s_video.text().split(";")]
         self.setup_dict["schacht"]["1_attribut"] = self.s_radiobutton_1.isChecked()
+        self.setup_dict["schacht"]["ergebnis_dp"] = self.combobox_schacht_dp.currentField()
 
         #settings for leitung
         if self.combobox_leitung.currentIndex() != -1:
@@ -388,6 +408,7 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["leitung"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_l_dp.text().split(";")]
         self.setup_dict["leitung"]["bezeichnung_video"] = [txt.strip() for txt in self.txt_l_video.text().split(";")]
         self.setup_dict["leitung"]["1_attribut"] = self.l_radiobutton_1.isChecked()
+        self.setup_dict["leitung"]["ergebnis_dp"] = self.combobox_schacht_dp.currentField()
         
         self.setup_dict["trennzeichen"] = self.txt_trennzeichen.text()
         self.setup_dict["datum"] = self.combobox_datum.currentText()

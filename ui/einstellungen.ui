@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_allgemein">
       <attribute name="title">
@@ -54,6 +54,13 @@
             <item row="1" column="0">
              <widget class="QgsMapLayerComboBox" name="combobox_haltungen"/>
             </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_19">
+              <property name="text">
+               <string>Attribut mit eindeutiger Bezeichnung der Haltung</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
@@ -64,10 +71,17 @@
             <item row="1" column="1">
              <widget class="QgsFieldComboBox" name="combobox_haltungen_id"/>
             </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_19">
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_24">
               <property name="text">
-               <string>Attribut mit eindeutiger Bezeichnung der Haltung</string>
+               <string>Attribut mit Ergebnis der Dichtheitsprüfung</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_haltungen_dp">
+              <property name="allowEmptyFieldName">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -78,6 +92,23 @@
             <property name="topMargin">
              <number>0</number>
             </property>
+            <item row="1" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_schacht_id"/>
+            </item>
+            <item row="3" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_schacht_dp">
+              <property name="allowEmptyFieldName">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>Attribut mit eindeutiger Bezeichnung des Schachtes</string>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="0">
              <widget class="QgsMapLayerComboBox" name="combobox_schacht"/>
             </item>
@@ -88,13 +119,10 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QgsFieldComboBox" name="combobox_schacht_id"/>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_21">
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_26">
               <property name="text">
-               <string>Attribut mit eindeutiger Bezeichnung des Schachtes</string>
+               <string>Attribut mit Ergebnis der Dichtheitsprüfung</string>
               </property>
              </widget>
             </item>
@@ -105,6 +133,16 @@
             <property name="topMargin">
              <number>0</number>
             </property>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Attribut mit eindeutiger Bezeichnung der Leitung</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_leitung_id"/>
+            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_7">
               <property name="text">
@@ -115,13 +153,17 @@
             <item row="1" column="0">
              <widget class="QgsMapLayerComboBox" name="combobox_leitung"/>
             </item>
-            <item row="1" column="1">
-             <widget class="QgsFieldComboBox" name="combobox_leitung_id"/>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_20">
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_25">
               <property name="text">
-               <string>Attribut mit eindeutiger Bezeichnung der Leitung</string>
+               <string>Attribut mit Ergebnis der Dichtheitsprüfung</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QgsFieldComboBox" name="combobox_leitung_dp">
+              <property name="allowEmptyFieldName">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -753,8 +795,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

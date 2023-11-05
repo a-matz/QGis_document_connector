@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1111</width>
-    <height>501</height>
+    <height>553</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -193,43 +193,92 @@
        <string>Details zu Dokumenten</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="checkbox_grossklein">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkbox_attribut">
          <property name="text">
-          <string>Groß-Kleinschreibung in  Bezeichnung ignorieren</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
+          <string>Groß-Kleinschreibung in  Attributkennung (Bsp. Nummer der Haltung) ignorieren</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <layout class="QGridLayout" name="gridLayout_9">
-         <property name="bottomMargin">
+       <item row="7" column="0">
+        <layout class="QGridLayout" name="gridLayout_8">
+         <property name="topMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_11">
+         <item row="0" column="3">
+          <widget class="QLabel" name="h_trenn2">
            <property name="text">
             <string>Trennzeichen</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="txt_trennzeichen">
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
+         <item row="0" column="0">
+          <widget class="QLabel" name="h_attribut1">
+           <property name="lineWidth">
+            <number>0</number>
            </property>
-           <property name="maxLength">
-            <number>1</number>
+           <property name="text">
+            <string>Attribut1</string>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <property name="indent">
+            <number>-1</number>
            </property>
           </widget>
          </item>
-         <item row="1" column="2">
-          <spacer name="horizontalSpacer_2">
+         <item row="0" column="2">
+          <widget class="QLabel" name="h_attribut2">
+           <property name="text">
+            <string>Attribut2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="9">
+          <widget class="QLabel" name="label_27">
+           <property name="text">
+            <string>.pdf</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QLabel" name="h_trenn3">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="6">
+          <widget class="QLabel" name="h_bezeichnung">
+           <property name="text">
+            <string>Bezeichnung</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="h_typ">
+           <property name="text">
+            <string>Typ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="8">
+          <widget class="QLabel" name="h_datum">
+           <property name="text">
+            <string>Datum</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="h_trenn1">
+           <property name="text">
+            <string>Trennzeichen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="10">
+          <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -241,26 +290,19 @@
            </property>
           </spacer>
          </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="combobox_datum">
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_16">
+         <item row="0" column="7">
+          <widget class="QLabel" name="h_trenn4">
            <property name="text">
-            <string>Datumsformat</string>
+            <string>Trennzeichen</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="3" column="0">
+       <item row="6" column="0">
         <widget class="QGroupBox" name="groupbox_haltung">
          <property name="title">
-          <string>Haltung</string>
+          <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="8" column="3">
@@ -321,7 +363,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radiol_radiobutton_2">
+             <widget class="QRadioButton" name="l_radiobutton_2">
               <property name="text">
                <string>2</string>
               </property>
@@ -367,7 +409,7 @@
           <item row="6" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>Typ</string>
+             <string>Typ-Kennung</string>
             </property>
            </widget>
           </item>
@@ -527,92 +569,23 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="checkbox_attribut">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkbox_grossklein">
          <property name="text">
-          <string>Groß-Kleinschreibung in  Attributkennung (Bsp. Nummer der Haltung) ignorieren</string>
+          <string>Groß-Kleinschreibung in  Bezeichnung ignorieren</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <layout class="QGridLayout" name="gridLayout_8">
-         <property name="topMargin">
+       <item row="3" column="0">
+        <layout class="QGridLayout" name="gridLayout_9">
+         <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="3">
-          <widget class="QLabel" name="h_trenn2">
-           <property name="text">
-            <string>Trennzeichen</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="h_attribut1">
-           <property name="lineWidth">
-            <number>0</number>
-           </property>
-           <property name="text">
-            <string>Attribut1</string>
-           </property>
-           <property name="margin">
-            <number>0</number>
-           </property>
-           <property name="indent">
-            <number>-1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="h_attribut2">
-           <property name="text">
-            <string>Attribut2</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="9">
-          <widget class="QLabel" name="label_27">
-           <property name="text">
-            <string>.pdf</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="5">
-          <widget class="QLabel" name="h_trenn3">
-           <property name="text">
-            <string>Trennzeichen</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="6">
-          <widget class="QLabel" name="h_bezeichnung">
-           <property name="text">
-            <string>Bezeichnung</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="4">
-          <widget class="QLabel" name="h_typ">
-           <property name="text">
-            <string>Typ</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="8">
-          <widget class="QLabel" name="h_datum">
-           <property name="text">
-            <string>Datum</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="h_trenn1">
-           <property name="text">
-            <string>Trennzeichen</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="10">
-          <spacer name="horizontalSpacer">
+         <item row="1" column="2">
+          <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -624,14 +597,68 @@
            </property>
           </spacer>
          </item>
-         <item row="0" column="7">
-          <widget class="QLabel" name="h_trenn4">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txt_trennzeichen">
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_11">
            <property name="text">
             <string>Trennzeichen</string>
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="combobox_datum">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Datumsformat</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>Dateiformate ignorieren</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="txt_ignore">
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
         </layout>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="checkbox_typ">
+         <property name="text">
+          <string>Groß-Kleinschreibung in Typ ignorieren</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -715,7 +742,7 @@
   <tabstop>txt_s_dp</tabstop>
   <tabstop>txt_s_video</tabstop>
   <tabstop>l_radiobutton_1</tabstop>
-  <tabstop>radiol_radiobutton_2</tabstop>
+  <tabstop>l_radiobutton_2</tabstop>
   <tabstop>leitung_field1</tabstop>
   <tabstop>leitung_field2</tabstop>
   <tabstop>txt_l_typ</tabstop>
@@ -726,8 +753,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

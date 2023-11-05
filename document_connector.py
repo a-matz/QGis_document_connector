@@ -30,6 +30,8 @@ from .resources import *
 # Import the code for the dialog
 #from .document_connector_dialog import DocumentConnectorDialog
 from .code.Einstellungen import Einstellungen
+from .code.ProtokolleVerknuepfen import Link
+from .code.ProtokolleOeffnen import Open
 import os.path
 
 
@@ -63,6 +65,8 @@ class DocumentConnector:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Dokumente verknüpfen')
+        self.toolbar = self.iface.addToolBar(u"Dokumente")
+        self.toolbar.setObjectName(u"Dokumente")
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -147,7 +151,7 @@ class DocumentConnector:
 
         if add_to_toolbar:
             # Adds plugin icon to Plugins toolbar
-            self.iface.addToolBarIcon(action)
+            self.toolbar.addAction(action)
 
         if add_to_menu:
             self.iface.addPluginToMenu(
@@ -161,16 +165,28 @@ class DocumentConnector:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/document_connector/icon.png'
+        icon_dir = ':/plugins/document_connector/icons'
         """self.add_action(
             icon_path,
             text=self.tr(u'Dokumente verknüpfen'),
             callback=self.run,
             parent=self.iface.mainWindow())"""
         self.add_action(
-            icon_path,
+            os.path.join(icon_dir,"einstellungen.png"),
             text=self.tr(u'Einstellungen'),
             callback=self.run_einstellungen,
+            parent=self.iface.mainWindow())
+        
+        self.add_action(
+            os.path.join(icon_dir,"link.png"),
+            text=self.tr(u'Dateien verknüpfen'),
+            callback=self.run_link,
+            parent=self.iface.mainWindow())
+        
+        self.add_action(
+            os.path.join(icon_dir,"kamera.png"),
+            text=self.tr(u'Dateien öffnen'),
+            callback=self.run_open,
             parent=self.iface.mainWindow())
 
         # will be set False in run()
@@ -209,3 +225,14 @@ class DocumentConnector:
         dlg = Einstellungen(self.iface)
         dlg.show()
         dlg.exec_()
+    
+    def run_link(self):
+        dlg = Link()
+        dlg.show()
+        dlg.exec_()
+    
+    def run_open(self):
+        pass
+        #dlg = Open(self.iface)
+        #dlg.show()
+        #dlg.exec_()

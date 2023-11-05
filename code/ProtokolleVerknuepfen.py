@@ -38,17 +38,17 @@ import processing
 # eigene klassen
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'protokolle_verknuepfen.ui'))
+    os.path.dirname(__file__),"../","ui", 'protokolle_verknuepfen.ui'))
 
 
-class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
+class Link(QtWidgets.QDialog, FORM_CLASS):
 
     #closingPlugin = pyqtSignal()
     okpressed = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(KanalProtokolleVerknuepfen, self).__init__(parent)
+        super(Link, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
@@ -64,7 +64,7 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
         
         self.check_input()
         try:
-            self.setup_dict = json.loads(QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('Kanalmanagement_Setup'))
+            self.setup_dict = json.loads(QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('Dokumente_Setup'))
             self.load_variables()
         except:
             self.setup_dict = None
@@ -81,21 +81,14 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
     def load_variables(self):
         if isinstance(self.setup_dict,dict):
             if "protokolle_setup" in self.setup_dict:
-                self.directory_outputDB.setFilePath(self.setup_dict["protokolle_setup"]["db_protokolle_path"])
+                if os.path.isfile(self.setup_dict["db_protokolle_path"]):
+                    self.directory_outputDB.setFilePath(self.setup_dict["db_protokolle_path"])
 
     def write_path(self):
-        if self.setup_dict == None or not isinstance(self.setup_dict,dict):
-            self.setup_dict = {}
-            self.setup_dict["protokolle_setup"] = {}
-            self.setup_dict["protokolle_setup"]["db_protokolle_path"] = self.directory_outputDB.filePath()
-        elif "protokolle_setup" not in self.setup_dict:
-            self.setup_dict["protokolle_setup"] = {}
-            self.setup_dict["protokolle_setup"]["db_protokolle_path"] = self.directory_outputDB.filePath()
-        else:
-            self.setup_dict["protokolle_setup"]["db_protokolle_path"] = self.directory_outputDB.filePath()
+        self.setup_dict["db_protokolle_path"] = self.directory_outputDB.filePath()
         
         dict_string = json.dumps(self.setup_dict)
-        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(),'Kanalmanagement_Setup',dict_string)
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(),'Dokumente_Setup',dict_string)
         
     def remove_duplicates(self, tabelle):
         db = self.directory_outputDB.filePath()
@@ -114,11 +107,9 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
         _writer = QgsVectorFileWriter.writeAsVectorFormat(out_layer, db, options)
 
     
-    def accept(self):
-        #prog = QProgressDialog("Suche Dateien..", "Cancel", 0, 1)
-        #prog.setWindowModality(Qt.WindowModal)
-        
+    def accept(self):        
         self.setCursor(Qt.WaitCursor)
+
         if self.checkbox_subdir.isChecked():
             files = glob.glob(self.directory_files.filePath() + '/**/*', recursive=True)
         else:
@@ -129,9 +120,10 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
         datei = [d for d in files if os.path.isfile(d)]
         objekt = {
         "pfad" : [],
-        "nr" : [],
+        "attribut1" : [],
+        "attribut2" : [],
         "typ" : [],
-        "bez" : [],
+        "bezeichnung" : [],
         "datum" : [],
         "zusatz" : [],
         "endung" : []
@@ -143,45 +135,62 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
             #    break
             name, extension = os.path.splitext(f)
             #name = name.lower()
-            typen = os.path.basename(name).split("_")
-            if len(typen) > 3:
+            text_glieder = os.path.basename(name).split(self.setup_dict["trennzeichen"])
+            #prüfen ob aktuelle datei relevant ist und ob durch 1 oder 2 attribute definiert
+            # irrelevant: typ nicht in dateiname
+            # 1 attribut: typ an 2.stelle
+            # 2 attribute: typ an 3.stelle
+            typ_liste = self.setup_dict["haltung"]["typ"] + self.setup_dict["schacht"]["typ"] + self.setup_dict["leitung"]["typ"]
+            try:
+                if text_glieder[1] in typ_liste: #typ passt an 2. stelle
+                    attribute = 1
+                elif text_glieder[2] in typ_liste: #typ passt an 3. stelle
+                    attribute = 2
+                else:
+                    continue #datei nicht relevant
+            except:
+                continue #datei nicht relevant
+
+            if len(text_glieder) > 2 + attribute:
                 objekt["pfad"].append(f)
-                #objekt["nr"].append(typen[0].upper())
-                objekt["nr"].append(typen[0].replace("mw","MW").replace("rw", "RW").replace("sw", "SW")) # falls systembezeichnung kleingeschrieben ist korrigieren
-                objekt["typ"].append(typen[1].lower())
-                objekt["bez"].append(typen[2].lower())
+                objekt["attribut1"].append(text_glieder[0])
+                if attribute == 2:
+                    objekt["attribut2"].append(text_glieder[1])
+                else:
+                    objekt["attribut2"].append(None)
+                objekt["typ"].append(text_glieder[attribute])
+                objekt["bezeichnung"].append(text_glieder[attribute+1])
                 try:
-                    objekt["datum"].append(datetime.strptime(typen[3].strip(), "%Y%m%d"))
+                    objekt["datum"].append(datetime.strptime(text_glieder[attribute+2].strip(), self.setup_dict["datum"]))
                 except:
                     objekt["datum"].append(datetime.strptime("19800101".strip(), "%Y%m%d"))
                 objekt["endung"].append(extension.replace(".","").lower())
-                if len(typen) > 4:
-                    objekt["zusatz"].append("-".join(typen[4:]))
+                if len(text_glieder) > 3+attribute:
+                    objekt["zusatz"].append("-".join(text_glieder[attribute+3:]))
                 else:
-                    objekt["zusatz"].append("")
-            # wenn eine Datei kein Datum hat dann trotzdem übernehmen - Anlass:Schachterhebungsblätter in Lustenau haben oft kein Datum
-            elif len(typen) == 3:
+                    objekt["zusatz"].append(None)
+            # wenn eine Datei kein Datum hat dann trotzdem übernehmen - Anlass:Schachterhebungsblätter teilweise ohne Datum
+            elif len(text_glieder) == 2 + attribute:
                 objekt["pfad"].append(f)
-                #objekt["nr"].append(typen[0].upper())
-                objekt["nr"].append(typen[0].replace("mw","MW").replace("rw", "RW").replace("sw", "SW")) # falls systembezeichnung kleingeschrieben ist korrigieren
-                objekt["typ"].append(typen[1].lower())
-                objekt["bez"].append(typen[2].lower())
+                objekt["attribut1"].append(text_glieder[0])
+                if attribute == 2:
+                    objekt["attribut2"].append(text_glieder[1])
+                else:
+                    objekt["attribut2"].append(None)
+                objekt["typ"].append(text_glieder[attribute])
+                objekt["bezeichnung"].append(text_glieder[attribute+1])
                 objekt["datum"].append(datetime.strptime("19800101".strip(), "%Y%m%d"))
                 objekt["endung"].append(extension.replace(".","").lower())
-                objekt["zusatz"].append("")
+                objekt["zusatz"].append(None)
                 
             #prog.setValue(i)
                     
-
+        print(objekt)
         df = pd.DataFrame.from_dict(objekt)
-        
-        schacht_daten = df.loc[(df["typ"].isin(["s","bw"])) & ~df["endung"].isin(["txt","jpg","jpeg","dwg","bak"])]
-        schacht_protokoll = df.loc[(df["typ"] == "s") & (df["bez"].isin(["erhebungsblatt","protokoll","aufmassblatt"])) & (df["endung"] != "txt")]
-        schacht_video = df.loc[(df["typ"] == "s") & (df["bez"] == "video") & (df["endung"] != "txt")]
-        
-        haltung_daten = df.loc[(df["typ"].isin(["h","l"])) & ~df["endung"].isin(["txt","jpg","jpeg","dwg","ipf","bak"])]
-        haltung_protokoll = df.loc[(df["typ"].isin(["h","l"])) & (df["bez"] == "tv-protokoll") & (df["endung"] != "txt")]
-        haltung_video = df.loc[(df["typ"].isin(["h","l"])) & (df["bez"] == "tv-video") & (df["endung"] != "txt")]
+        df = df[~df.endung.isin(self.setup_dict["ignorieren"])]
+        schacht_daten = df.loc[df["typ"].isin(self.setup_dict["schacht"]["typ"])]
+        haltung_daten = df.loc[df["typ"].isin(self.setup_dict["haltung"]["typ"])]
+        leitung_daten = df.loc[df["typ"].isin(self.setup_dict["leitung"]["typ"])]
 
         fin_db = self.directory_outputDB.filePath().replace("/","\\")
 
@@ -194,9 +203,10 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
             source = gpkg_driver.CreateDataSource(fin_db)
             attribute_list = [
                 QgsField("pfad", QVariant.String),
-                QgsField("nr",  QVariant.String),
+                QgsField("attribut1",  QVariant.String),
+                QgsField("attribut2",  QVariant.String),
                 QgsField("typ", QVariant.String),
-                QgsField("bez", QVariant.String),
+                QgsField("bezeichnung", QVariant.String),
                 QgsField("datum", QVariant.Date),
                 QgsField("zusatz", QVariant.String),
                 QgsField("endung", QVariant.String)
@@ -208,30 +218,32 @@ class KanalProtokolleVerknuepfen(QtWidgets.QDialog, FORM_CLASS):
             layer.updateFields()
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-            options.layerName = "Inspektionsdaten"
+            #options.layerName = "Dateien"
+            #_writer = QgsVectorFileWriter.writeAsVectorFormat(layer, fin_db, options)
+            options.layerName = "Dateien_Schacht"
             _writer = QgsVectorFileWriter.writeAsVectorFormat(layer, fin_db, options)
-            options.layerName = "Inspektionsdaten_Schacht"
+            options.layerName = "Dateien_Haltung"
             _writer = QgsVectorFileWriter.writeAsVectorFormat(layer, fin_db, options)
-            options.layerName = "Inspektionsdaten_Haltung"
+            options.layerName = "Dateien_Leitung"
             _writer = QgsVectorFileWriter.writeAsVectorFormat(layer, fin_db, options)
 
 
         con = sqlite3.connect(fin_db)
-        df.to_sql('Inspektionsdaten', con, if_exists="append", index = False)
-        schacht_daten.to_sql('Inspektionsdaten_Schacht', con, if_exists="append", index = False)
-        #schacht_protokoll.to_sql('schacht_protokolle', con, if_exists=methode, index = False)
-        #schacht_video.to_sql('schacht_videos', con, if_exists=methode, index = False)
-        haltung_daten.to_sql('Inspektionsdaten_Haltung', con, if_exists="append", index = False)
-        #haltung_protokoll.to_sql('haltung_protokolle', con, if_exists=methode, index = False)
-        #haltung_video.to_sql('haltung_videos', con, if_exists=methode, index = False)
+        #df.to_sql('Dateien', con, if_exists="append", index = False)
+        if len(schacht_daten.index) > 0:
+            schacht_daten.to_sql('Dateien_Schacht', con, if_exists="append", index = False)
+        if len(haltung_daten.index) > 0:
+            haltung_daten.to_sql('Dateien_Haltung', con, if_exists="append", index = False)
+        if len(leitung_daten.index) > 0:
+            leitung_daten.to_sql('Dateien_Leitung', con, if_exists="append", index = False)
         con.close()
 
         if self.checkbox_useInCurrentProject.isChecked():
             self.write_path()
         
         if self.checkbox_removeDuplicates.isChecked():
-            self.remove_duplicates("Inspektionsdaten_Schacht")
-            self.remove_duplicates("Inspektionsdaten_Haltung")
+            self.remove_duplicates("Dateien_Schacht")
+            self.remove_duplicates("Dateien_Haltung")
 
         self.close()
         self.setCursor(Qt.ArrowCursor)

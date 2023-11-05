@@ -43,10 +43,10 @@ from qgis.PyQt.QtWidgets import (QMessageBox, QCompleter, QDialog, QGridLayout, 
 # eigene klassen
 from ..tools.mapIdentify import selectTool
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'protokolle_oeffnen.ui'))
+    os.path.dirname(__file__),"../","ui", 'protokolle_oeffnen.ui'))
 
 
-class KanalProtokolleOeffnen(QtWidgets.QDockWidget, FORM_CLASS):
+class Open(QtWidgets.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
     load_haltung = pyqtSignal()
@@ -55,7 +55,7 @@ class KanalProtokolleOeffnen(QtWidgets.QDockWidget, FORM_CLASS):
 
     def __init__(self,iface, parent=None):
         """Constructor."""
-        super(KanalProtokolleOeffnen, self).__init__(parent)
+        super(Open, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

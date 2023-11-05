@@ -156,7 +156,7 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.txt_h_video.setText("Video; TV-Video")
 
     def set_txt_schacht(self):
-        self.txt_s_typ.setText("S")
+        self.txt_s_typ.setText("S; BW")
         self.txt_s_protokoll.setText("Erhebungsblatt; Protokoll; Aufmassblatt")
         self.txt_s_video.setText("Video")
     
@@ -189,9 +189,13 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
 
         self.set_datum()
         if isinstance(self.setup_dict, dict):  
-            self.txt_trennzeichen.setText(self.setup_dict["trennzeichen"])      
+            self.txt_trennzeichen.setText(self.setup_dict["trennzeichen"])  
+            self.txt_ignore.setText("; ".join(self.setup_dict["ignorieren"])) 
+            self.spinbox_zoom.setValue(self.setup_dict["zoom_massstab"])
+            self.file_protokolle.setFilePath(self.setup_dict["db_protokolle_path"])   
             self.checkbox_grossklein.setChecked(self.setup_dict["case_grossklein"])
-            self.checkbox_attribut.setChecked(self.setup_dict["case_attribut"])  
+            self.checkbox_attribut.setChecked(self.setup_dict["case_attribut"]) 
+            self.checkbox_typ.setChecked(self.setup_dict["case_typ"])  
             idx_datum = self.combobox_datum.findText(self.setup_dict["datum"])
             if idx_datum != -1:
                 self.combobox_datum.setCurrentIndex(idx_datum)
@@ -219,16 +223,17 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
                                 self.combobox_haltungen.setCurrentIndex(i)
                                 layer_found = True
                                 break
-                        self.haltung_field1.setLayer(self.combobox_haltungen.currentLayer())
-                        self.combobox_haltungen_id.setLayer(self.combobox_haltungen.currentLayer())
-                        self.haltung_field2.setLayer(self.combobox_haltungen.currentLayer())
+                        if layer_found:
+                            self.haltung_field1.setLayer(self.combobox_haltungen.currentLayer())
+                            self.combobox_haltungen_id.setLayer(self.combobox_haltungen.currentLayer())
+                            self.haltung_field2.setLayer(self.combobox_haltungen.currentLayer())
 
-                        self.combobox_haltungen_id.setCurrentText(typ_dict["attribut_id"])
-                        self.haltung_field1.setCurrentText(typ_dict["attribut1"])
-                        if "attribut2" in typ_dict.keys():
-                            self.haltung_field2.setCurrentText(typ_dict["attribut2"])
-                        
-                        if not layer_found:
+                            self.combobox_haltungen_id.setCurrentText(typ_dict["attribut_id"])
+                            self.haltung_field1.setCurrentText(typ_dict["attribut1"])
+                            if "attribut2" in typ_dict.keys():
+                                self.haltung_field2.setCurrentText(typ_dict["attribut2"])
+                            
+                        else:
                             self.combobox_haltungen.setCurrentIndex(-1)
                     else:
                         self.combobox_haltungen.setCurrentIndex(-1)
@@ -237,17 +242,82 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
                     self.txt_h_dp.setText("; ".join(typ_dict["bezeichnung_dp"]))
                     self.txt_h_video.setText("; ".join(typ_dict["bezeichnung_video"])) 
                     self.txt_h_typ.setText("; ".join(typ_dict["typ"]))
-                
+                elif typ == "schacht":
+                    if typ_dict["1_attribut"]:
+                        self.s_radiobutton_1.setChecked(True)
+                    else:
+                        self.s_radiobutton_2.setChecked(True)
 
+                    if "layer_id" in typ_dict.keys():
+                        id = typ_dict["layer_id"]
+
+                        layer_found = False
+                        for i in range(self.combobox_schacht.count()):
+                            if id == self.combobox_schacht.layer(i).id():
+                                self.combobox_schacht.setCurrentIndex(i)
+                                layer_found = True
+                                break
+                        if layer_found:
+                            self.schacht_field1.setLayer(self.combobox_schacht.currentLayer())
+                            self.combobox_schacht_id.setLayer(self.combobox_schacht.currentLayer())
+                            self.schacht_field2.setLayer(self.combobox_schacht.currentLayer())
+
+                            self.combobox_schacht_id.setCurrentText(typ_dict["attribut_id"])
+                            self.schacht_field1.setCurrentText(typ_dict["attribut1"])
+                            if "attribut2" in typ_dict.keys():
+                                self.schacht_field2.setCurrentText(typ_dict["attribut2"])
+                        
+                        else:
+                            self.combobox_schacht.setCurrentIndex(-1)
+                    else:
+                        self.combobox_schacht.setCurrentIndex(-1)
+                    
+                    self.txt_s_protokoll.setText("; ".join(typ_dict["bezeichnung_protokoll"]))
+                    self.txt_s_dp.setText("; ".join(typ_dict["bezeichnung_dp"]))
+                    self.txt_s_video.setText("; ".join(typ_dict["bezeichnung_video"])) 
+                    self.txt_s_typ.setText("; ".join(typ_dict["typ"]))
+                elif typ == "leitung":
+                    if typ_dict["1_attribut"]:
+                        self.l_radiobutton_1.setChecked(True)
+                    else:
+                        self.l_radiobutton_2.setChecked(True)
+
+                    if "layer_id" in typ_dict.keys():
+                        id = typ_dict["layer_id"]
+
+                        layer_found = False
+                        for i in range(self.combobox_leitung.count()):
+                            if id == self.combobox_leitung.layer(i).id():
+                                self.combobox_leitung.setCurrentIndex(i)
+                                layer_found = True
+                                break
+                        if layer_found:
+                            self.leitung_field1.setLayer(self.combobox_leitung.currentLayer())
+                            self.combobox_leitung_id.setLayer(self.combobox_leitung.currentLayer())
+                            self.leitung_field2.setLayer(self.combobox_leitung.currentLayer())
+
+                            self.combobox_leitung_id.setCurrentText(typ_dict["attribut_id"])
+                            self.leitung_field1.setCurrentText(typ_dict["attribut1"])
+                            if "attribut2" in typ_dict.keys():
+                                self.leitung_field2.setCurrentText(typ_dict["attribut2"])
+                        
+                        else:
+                            self.combobox_leitung.setCurrentIndex(-1)
+                    else:
+                        self.combobox_leitung.setCurrentIndex(-1)
+                    
+                    self.txt_l_protokoll.setText("; ".join(typ_dict["bezeichnung_protokoll"]))
+                    self.txt_l_dp.setText("; ".join(typ_dict["bezeichnung_dp"]))
+                    self.txt_l_video.setText("; ".join(typ_dict["bezeichnung_video"])) 
+                    self.txt_l_typ.setText("; ".join(typ_dict["typ"]))
 
             
-            self.spinbox_zoom.setValue(self.setup_dict["zoom_massstab"])
-            # tab protokolle
-            self.file_protokolle.setFilePath(self.setup_dict["db_protokolle_path"])
+           
             
         else:
             self.reset_combobox()
             self.txt_trennzeichen.setText("_")
+            self.txt_ignore.setText("txt; ipf; bak")
             self.set_txt_haltung()
             self.set_txt_schacht()
             self.set_txt_leitung()
@@ -323,8 +393,9 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["datum"] = self.combobox_datum.currentText()
         self.setup_dict["case_grossklein"] = self.checkbox_grossklein.isChecked()
         self.setup_dict["case_attribut"] = self.checkbox_attribut.isChecked()
+        self.setup_dict["case_typ"] = self.checkbox_typ.isChecked()
         self.setup_dict["zoom_massstab"] = self.spinbox_zoom.value()
-
+        self.setup_dict["ignorieren"] = [txt.strip().lower() for txt in self.txt_ignore.text().split(";")]
 
         # Protokolle 
         self.setup_dict["db_protokolle_path"] = self.file_protokolle.filePath()
@@ -442,7 +513,6 @@ class InputChecker():
         original_db = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","development","Sanierungsdatenbank.gpkg"))
         original_dict = self.get_layer_dict(original_db)
         san_dict = self.get_layer_dict(san_db)
-        print("check")
         db_ok = True
         layer_fehlt = []
         for original_layer in original_dict.keys():

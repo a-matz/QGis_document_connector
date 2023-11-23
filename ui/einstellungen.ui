@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1111</width>
-    <height>553</height>
+    <width>1277</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,7 +52,11 @@
              <number>0</number>
             </property>
             <item row="1" column="0">
-             <widget class="QgsMapLayerComboBox" name="combobox_haltungen"/>
+             <widget class="QgsMapLayerComboBox" name="combobox_haltungen">
+              <property name="allowEmptyLayer">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item row="0" column="1">
              <widget class="QLabel" name="label_19">
@@ -110,7 +114,11 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QgsMapLayerComboBox" name="combobox_schacht"/>
+             <widget class="QgsMapLayerComboBox" name="combobox_schacht">
+              <property name="allowEmptyLayer">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_5">
@@ -151,7 +159,11 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QgsMapLayerComboBox" name="combobox_leitung"/>
+             <widget class="QgsMapLayerComboBox" name="combobox_leitung">
+              <property name="allowEmptyLayer">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item row="2" column="1">
              <widget class="QLabel" name="label_25">

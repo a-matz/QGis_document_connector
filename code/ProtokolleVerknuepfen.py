@@ -244,6 +244,7 @@ class Link(QtWidgets.QDialog, FORM_CLASS):
         if self.checkbox_removeDuplicates.isChecked():
             self.remove_duplicates("Dateien_Schacht")
             self.remove_duplicates("Dateien_Haltung")
+            self.remove_duplicates("Dateien_Leitung")
 
         self.close()
         self.setCursor(Qt.ArrowCursor)

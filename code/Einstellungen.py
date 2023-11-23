@@ -228,10 +228,11 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
 
                         layer_found = False
                         for i in range(self.combobox_haltungen.count()):
-                            if id == self.combobox_haltungen.layer(i).id():
-                                self.combobox_haltungen.setCurrentIndex(i)
-                                layer_found = True
-                                break
+                            if self.combobox_haltungen.layer(i) != None:
+                                if id == self.combobox_haltungen.layer(i).id():
+                                    self.combobox_haltungen.setCurrentIndex(i)
+                                    layer_found = True
+                                    break
                         if layer_found:
                             self.haltung_field1.setLayer(self.combobox_haltungen.currentLayer())
                             self.combobox_haltungen_id.setLayer(self.combobox_haltungen.currentLayer())
@@ -265,10 +266,11 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
 
                         layer_found = False
                         for i in range(self.combobox_schacht.count()):
-                            if id == self.combobox_schacht.layer(i).id():
-                                self.combobox_schacht.setCurrentIndex(i)
-                                layer_found = True
-                                break
+                            if self.combobox_schacht.layer(i) != None:
+                                if id == self.combobox_schacht.layer(i).id():
+                                    self.combobox_schacht.setCurrentIndex(i)
+                                    layer_found = True
+                                    break
                         if layer_found:
                             self.schacht_field1.setLayer(self.combobox_schacht.currentLayer())
                             self.combobox_schacht_id.setLayer(self.combobox_schacht.currentLayer())
@@ -302,10 +304,11 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
 
                         layer_found = False
                         for i in range(self.combobox_leitung.count()):
-                            if id == self.combobox_leitung.layer(i).id():
-                                self.combobox_leitung.setCurrentIndex(i)
-                                layer_found = True
-                                break
+                            if self.combobox_leitung.layer(i) != None:
+                                if id == self.combobox_leitung.layer(i).id():
+                                    self.combobox_leitung.setCurrentIndex(i)
+                                    layer_found = True
+                                    break
                         if layer_found:
                             self.leitung_field1.setLayer(self.combobox_leitung.currentLayer())
                             self.combobox_leitung_id.setLayer(self.combobox_leitung.currentLayer())
@@ -363,14 +366,23 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
             self.setup_dict["leitung"] = {}
         
         #settings for haltung
-        if self.combobox_haltungen.currentIndex() != -1:
+        if self.combobox_haltungen.currentIndex() != -1 and self.combobox_haltungen.currentLayer() != None:
             self.setup_dict["haltung"]["layer_id"] = self.combobox_haltungen.currentLayer().id()
+        else:
+            self.setup_dict["haltung"]["layer_id"] = None
         if self.combobox_haltungen_id.currentIndex() != -1:
             self.setup_dict["haltung"]["attribut_id"] = self.combobox_haltungen_id.currentField()
+        else:
+            self.setup_dict["haltung"]["attribut_id"] = None
         if self.haltung_field1.currentIndex() != -1:
             self.setup_dict["haltung"]["attribut1"] = self.haltung_field1.currentField()
+        else:
+            self.setup_dict["haltung"]["attribut1"] = None
         if self.haltung_field1.currentIndex() != -1 and  self.h_radiobutton_2.isChecked():
             self.setup_dict["haltung"]["attribut2"] = self.haltung_field2.currentField()
+        else:
+            self.setup_dict["haltung"]["attribut2"] = None
+        
         self.setup_dict["haltung"]["typ"] = [txt.strip() for txt in self.txt_h_typ.text().split(";")]
         self.setup_dict["haltung"]["bezeichnung_protokoll"] = [txt.strip() for txt in self.txt_h_protokoll.text().split(";")]
         self.setup_dict["haltung"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_h_dp.text().split(";")]
@@ -379,14 +391,23 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["haltung"]["ergebnis_dp"] = self.combobox_haltungen_dp.currentField()
 
         #settings for schacht
-        if self.combobox_schacht.currentIndex() != -1:
+        if self.combobox_schacht.currentIndex() != -1 and self.combobox_schacht.currentLayer() != None:
             self.setup_dict["schacht"]["layer_id"] = self.combobox_schacht.currentLayer().id()
+        else:
+            self.setup_dict["schacht"]["layer_id"] = None
         if self.combobox_schacht_id.currentIndex() != -1:
             self.setup_dict["schacht"]["attribut_id"] = self.combobox_schacht_id.currentField()
+        else:
+            self.setup_dict["schacht"]["attribut_id"] = None
         if self.schacht_field1.currentIndex() != -1:
             self.setup_dict["schacht"]["attribut1"] = self.schacht_field1.currentField()
+        else:
+            self.setup_dict["schacht"]["attribut1"] = None
         if self.schacht_field1.currentIndex() != -1 and  self.s_radiobutton_2.isChecked():
             self.setup_dict["schacht"]["attribut2"] = self.schacht_field2.currentField()
+        else:
+            self.setup_dict["schacht"]["attribut2"] = None
+
         self.setup_dict["schacht"]["typ"] = [txt.strip() for txt in self.txt_s_typ.text().split(";")]
         self.setup_dict["schacht"]["bezeichnung_protokoll"] = [txt.strip() for txt in self.txt_s_protokoll.text().split(";")]
         self.setup_dict["schacht"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_s_dp.text().split(";")]
@@ -395,14 +416,23 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["schacht"]["ergebnis_dp"] = self.combobox_schacht_dp.currentField()
 
         #settings for leitung
-        if self.combobox_leitung.currentIndex() != -1:
-            self.setup_dict["leitung"]["layer_id"] = self.combobox_leitung.currentLayer().id()
+        if self.combobox_leitung.currentIndex() != -1 and self.combobox_leitung.currentLayer() != None:
+                self.setup_dict["leitung"]["layer_id"] = self.combobox_leitung.currentLayer().id()
+        else:
+            self.setup_dict["leitung"]["layer_id"] = None
         if self.combobox_leitung_id.currentIndex() != -1:
             self.setup_dict["leitung"]["attribut_id"] = self.combobox_leitung_id.currentField()
+        else:
+            self.setup_dict["leitung"]["attribut_id"] = None
         if self.leitung_field1.currentIndex() != -1:
             self.setup_dict["leitung"]["attribut1"] = self.leitung_field1.currentField()
+        else:
+            self.setup_dict["leitung"]["attribut1"] = None
         if self.leitung_field1.currentIndex() != -1 and  self.l_radiobutton_2.isChecked():
             self.setup_dict["leitung"]["attribut2"] = self.leitung_field2.currentField()
+        else:
+            self.setup_dict["leitung"]["attribut2"] = None
+
         self.setup_dict["leitung"]["typ"] = [txt.strip() for txt in self.txt_l_typ.text().split(";")]
         self.setup_dict["leitung"]["bezeichnung_protokoll"] = [txt.strip() for txt in self.txt_l_protokoll.text().split(";")]
         self.setup_dict["leitung"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_l_dp.text().split(";")]

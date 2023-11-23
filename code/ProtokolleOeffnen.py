@@ -65,11 +65,13 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         #self.txt_haltungID.setVisible(False) # Textfeld mit HaltungsID verbergen
-        self.load_attribute_names_to_dict()
-        self.haltungNr_add_completer()
-        self.schachtNr_add_completer()
+        #self.load_attribute_names_to_dict()
+        self.setup_ui_dict()
+        #self.haltungNr_add_completer()
+        #self.schachtNr_add_completer()
 
         #connectors definieren
+        """
         self.button_select_haltung.clicked.connect(lambda: self.select_object(self.layer_object["haltung"],self.variablen["attribut_haltungNr"], "Haltung"))
         self.txt_haltungNr.returnPressed.connect(lambda: self.load_layer_from_textField("Haltung"))
         self.txt_haltungNr.textEdited.connect(self.change_col_haltungNr)
@@ -79,7 +81,7 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.txt_schachtNr.textEdited.connect(self.change_col_schachtNr)
 
         self.button_h_protokoll.clicked.connect(lambda: self.open_file(self.tv_pfad[self.h_combobox_protokoll.currentIndex()]))
-        self.button_h_druck.clicked.connect(lambda: self.open_file(self.druck_pfad[self.h_combobox_druck.currentIndex()]))
+        self.button_h_dp.clicked.connect(lambda: self.open_file(self.druck_pfad[self.h_combobox_druck.currentIndex()]))
         self.button_h_video.clicked.connect(lambda: self.open_file(self.video_pfad[self.h_combobox_video.currentIndex()]))
         self.button_h_protokoll_video.clicked.connect(lambda: self.open_file(self.tv_pfad[self.button_h_protokoll.currentIndex()],self.video_pfad[self.combobox_video.currentIndex()]))
         self.button_zoom_haltung.clicked.connect(lambda: self.zoom_to_object(self.layer_object["haltung"], self.features["haltung"].id()))
@@ -90,6 +92,7 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.button_zoom_schacht.clicked.connect(lambda: self.zoom_to_object(self.layer_object["schacht"], self.features["schacht"].id()))
 
         #wenn leitung definiert dann leitung initialisieren
+
         if self.leitung_defined:
             self.leitungNr_add_completer()
 
@@ -105,6 +108,7 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         else:
             self.tabWidget.removeTab(2)
         
+        """
         self.tabWidget.currentChanged.connect(self.tab_changed)
         
         self.setCursor(Qt.ArrowCursor)
@@ -123,7 +127,186 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                     self.select_object(self.layer_object["leitung"],self.variablen["attribut_leitungNr"], "Leitung")
         except:
             pass
+
+    def setup_ui_dict(self):
+        saved_dict = json.loads(QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('Dokumente_Setup'))
+        self.setup_dict = {
+            "haltung" : {
+                "ui": {
+                    "protokoll":
+                    {
+                        "label" : self.h_protokoll_label,
+                        "txt" : self.txt_h_protokoll_anzahl,
+                        "combobox" : self.h_combobox_protokoll,
+                        "button" : self.button_h_protokoll
+                    },
+                    "dp" :
+                    {
+                        "label" : self.h_dp_label,
+                        "txt" : self.txt_h_dp_anzahl,
+                        "combobox" : self.h_combobox_dp,
+                        "button" : self.button_h_dp
+                    },
+                    "video":
+                    {
+                        "label" : self.h_video_label,
+                        "txt" : self.txt_h_video_anzahl,
+                        "combobox" : self.h_combobox_video,
+                        "button" : self.button_h_video
+                    },
+                    "andere":
+                    {
+                        "label" : self.h_andere_label,
+                        "txt" : self.txt_h_andere_anzahl,
+                        "combobox" : self.h_combobox_andere,
+                        "button" : self.button_h_andere
+                    }
+                },
+                "variablen": {
+                    "layer_protokolle" : "Inspektionsdaten_Haltung",
+                    "layer_id" : saved_dict["haltung"]["layer_id"],
+                    "attribut_id" : saved_dict["haltung"]["attribut_id"],
+                    "1_attribut" : saved_dict["haltung"]["1_attribut"],
+                    "attribut1" : saved_dict["haltung"]["attribut1"],
+                    "attribut2" : saved_dict["haltung"]["attribut2"],
+                    "typ" : saved_dict["haltung"]["typ"],
+                    "bezeichnung_protokoll" : saved_dict["haltung"]["bezeichnung_protokoll"],
+                    "bezeichnung_dp" : saved_dict["haltung"]["bezeichnung_dp"] ,
+                    "bezeichnung_video" : saved_dict["haltung"]["bezeichnung_video"],
+                    "ergebnis_dp" : saved_dict["haltung"]["ergebnis_dp"],
+                    "tab_id": 0
+                }
+            },
+            "schacht": {
+                "ui": {
+                    "protokoll":
+                    {
+                        "label" : self.s_protokoll_label,
+                        "txt" : self.txt_s_protokoll_anzahl,
+                        "combobox" : self.s_combobox_protokoll,
+                        "button" : self.button_s_protokoll
+                    },
+                    "dp" :
+                    {
+                        "label" : self.s_dp_label,
+                        "txt" : self.txt_s_dp_anzahl,
+                        "combobox" : self.s_combobox_dp,
+                        "button" : self.button_s_dp
+                    },
+                    "video":
+                    {
+                        "label" : self.s_video_label,
+                        "txt" : self.txt_s_video_anzahl,
+                        "combobox" : self.s_combobox_video,
+                        "button" : self.button_s_video
+                    },
+                    "andere":
+                    {
+                        "label" : self.s_andere_label,
+                        "txt" : self.txt_s_andere_anzahl,
+                        "combobox" : self.s_combobox_andere,
+                        "button" : self.button_s_andere
+                    }
+                },
+                "variablen": {
+                    "layer_protokolle" : "Inspektionsdaten_Schacht",
+                    "layer_id" : saved_dict["schacht"]["layer_id"],
+                    "attribut_id" : saved_dict["schacht"]["attribut_id"],
+                    "1_attribut" : saved_dict["schacht"]["1_attribut"],
+                    "attribut1" : saved_dict["schacht"]["attribut1"],
+                    "attribut2" : saved_dict["schacht"]["attribut2"],
+                    "typ" : saved_dict["schacht"]["typ"],
+                    "bezeichnung_protokoll" : saved_dict["schacht"]["bezeichnung_protokoll"],
+                    "bezeichnung_dp" : saved_dict["schacht"]["bezeichnung_dp"] ,
+                    "bezeichnung_video" : saved_dict["schacht"]["bezeichnung_video"],
+                    "ergebnis_dp" : saved_dict["schacht"]["ergebnis_dp"],
+                    "tab_id": 1
+                }
+            },
+            "leitung": {
+                "ui": {
+                    "protokoll":
+                    {
+                        "label" : self.l_protokoll_label,
+                        "txt" : self.txt_l_protokoll_anzahl,
+                        "combobox" : self.l_combobox_protokoll,
+                        "button" : self.button_l_protokoll
+                    },
+                    "dp" :
+                    {
+                        "label" : self.l_dp_label,
+                        "txt" : self.txt_l_dp_anzahl,
+                        "combobox" : self.l_combobox_dp,
+                        "button" : self.button_l_dp
+                    },
+                    "video":
+                    {
+                        "label" : self.l_video_label,
+                        "txt" : self.txt_l_video_anzahl,
+                        "combobox" : self.l_combobox_video,
+                        "button" : self.button_l_video
+                    },
+                    "andere":
+                    {
+                        "label" : self.l_andere_label,
+                        "txt" : self.txt_l_andere_anzahl,
+                        "combobox" : self.l_combobox_andere,
+                        "button" : self.button_l_andere
+                    }
+                },
+                "variablen": {
+                    "layer_protokolle" : "Inspektionsdaten_Leitung",
+                    "layer_id" : saved_dict["leitung"]["layer_id"],
+                    "attribut_id" : saved_dict["leitung"]["attribut_id"],
+                    "1_attribut" : saved_dict["leitung"]["1_attribut"],
+                    "attribut1" : saved_dict["leitung"]["attribut1"],
+                    "attribut2" : saved_dict["leitung"]["attribut2"],
+                    "typ" : saved_dict["leitung"]["typ"],
+                    "bezeichnung_protokoll" : saved_dict["leitung"]["bezeichnung_protokoll"],
+                    "bezeichnung_dp" : saved_dict["leitung"]["bezeichnung_dp"] ,
+                    "bezeichnung_video" : saved_dict["leitung"]["bezeichnung_video"],
+                    "ergebnis_dp" : saved_dict["leitung"]["ergebnis_dp"],
+                    "tab_id": 2
+                }
+            },
+            "allgemein": {
+                    "trennzeichen" : saved_dict["trennzeichen"],
+                    "datum" : saved_dict["datum"],
+                    "case_grossklein" : saved_dict["case_grossklein"],
+                    "case_attribut" : saved_dict["case_attribut"],
+                    "case_typ" : saved_dict["case_typ"],
+                    "zoom_massstab" : saved_dict["zoom_massstab"],
+                    "ignorieren" : saved_dict["ignorieren"],
+                    "db_protokolle_path" : saved_dict["db_protokolle_path"]
+            }  
+        }
+
+        self.layer_object = {}
+        for typ, values in self.setup_dict.items():
+            if typ != "allgemein":
+                typ_dict = self.setup_dict[typ]
+                if QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]) == None:
+                    self.tabWidget.removeTab(typ_dict["variablen"]["tab_id"])
+                    continue
+                else:
+                    if QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]).isValid():
+                        self.layer_object[typ] = QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"])
+                        self.layer_object[f"{typ}_clone"] = QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]).clone()
+                if typ_dict["variablen"]["bezeichnung_protokoll"][0] == "":
+                    for element in typ_dict["ui"]["protokoll"].values():
+                        element.hide()
+                if typ_dict["variablen"]["bezeichnung_dp"][0] == "":
+                    for element in typ_dict["ui"]["dp"].values():
+                        element.hide()
+                if typ_dict["variablen"]["bezeichnung_video"][0] == "":
+                    for element in typ_dict["ui"]["video"].values():
+                        element.hide()
+
+        self.features = {}
+
         
+        
+
     def closeEvent(self, event):
         """
         Wird bei beenden des Fenserts ausgeführt

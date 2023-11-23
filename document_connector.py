@@ -21,7 +21,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
@@ -71,6 +71,7 @@ class DocumentConnector:
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
+        self.protokolleOeffnenisActive = False
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -232,7 +233,26 @@ class DocumentConnector:
         dlg.exec_()
     
     def run_open(self):
-        pass
-        #dlg = Open(self.iface)
-        #dlg.show()
-        #dlg.exec_()
+        #pass
+        if not self.protokolleOeffnenisActive:
+            self.protokolleOeffnenisActive = True
+            # Create the dockwidget (after translation) and keep reference
+            self.protokolleWidget = Open(self.iface)
+
+            # connect to provide cleanup on closing of dockwidget
+            self.protokolleWidget.closingPlugin.connect(self.onCloseProtokolleDockWidget)
+
+            # show the dockwidget
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.protokolleWidget)
+
+            self.protokolleWidget.show()
+            self.protokolleWidget.setVisible(True)
+            self.protokolleWidget.raise_()
+    
+    def onCloseProtokolleDockWidget(self):
+        """Cleanup necessary items here when plugin dockwidget is closed"""
+
+        # disconnects
+        self.protokolleWidget.closingPlugin.disconnect(self.onCloseProtokolleDockWidget)
+        self.protokolleWidget = None
+        self.protokolleOeffnenisActive = False

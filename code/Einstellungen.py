@@ -438,11 +438,11 @@ class Einstellungen(QtWidgets.QDialog, FORM_CLASS):
         self.setup_dict["leitung"]["bezeichnung_dp"] = [txt.strip() for txt in self.txt_l_dp.text().split(";")]
         self.setup_dict["leitung"]["bezeichnung_video"] = [txt.strip() for txt in self.txt_l_video.text().split(";")]
         self.setup_dict["leitung"]["1_attribut"] = self.l_radiobutton_1.isChecked()
-        self.setup_dict["leitung"]["ergebnis_dp"] = self.combobox_schacht_dp.currentField()
+        self.setup_dict["leitung"]["ergebnis_dp"] = self.combobox_leitung_dp.currentField()
         
         self.setup_dict["trennzeichen"] = self.txt_trennzeichen.text()
         self.setup_dict["datum"] = self.combobox_datum.currentText()
-        self.setup_dict["case_grossklein"] = self.checkbox_grossklein.isChecked()
+        self.setup_dict["case_bezeichnung"] = self.checkbox_grossklein.isChecked()
         self.setup_dict["case_attribut"] = self.checkbox_attribut.isChecked()
         self.setup_dict["case_typ"] = self.checkbox_typ.isChecked()
         self.setup_dict["zoom_massstab"] = self.spinbox_zoom.value()

@@ -160,7 +160,12 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                         "txt" : self.txt_h_andere_anzahl,
                         "combobox" : self.h_combobox_andere,
                         "button" : self.button_h_andere
-                    }
+                    },
+                    "button_select" : self.button_select_haltung,
+                    "txt_nr" : self.txt_haltungNr,
+                    "txt_ergebnisDP" : self.txt_h_ergebnisDP,
+                    "button_zoom" : self.button_zoom_haltung,
+                    "button_protokoll_video" : self.button_h_protokoll_video
                 },
                 "variablen": {
                     "layer_protokolle" : "Inspektionsdaten_Haltung",
@@ -206,7 +211,12 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                         "txt" : self.txt_s_andere_anzahl,
                         "combobox" : self.s_combobox_andere,
                         "button" : self.button_s_andere
-                    }
+                    },
+                    "button_select" : self.button_select_schacht,
+                    "txt_nr" : self.txt_schachtNr,
+                    "txt_ergebnisDP" : self.txt_s_ergebnisDP,
+                    "button_zoom" : self.button_zoom_schacht,
+                    "button_protokoll_video" : self.button_s_protokoll_video
                 },
                 "variablen": {
                     "layer_protokolle" : "Inspektionsdaten_Schacht",
@@ -252,7 +262,12 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                         "txt" : self.txt_l_andere_anzahl,
                         "combobox" : self.l_combobox_andere,
                         "button" : self.button_l_andere
-                    }
+                    },
+                    "button_select" : self.button_select_leitung,
+                    "txt_nr" : self.txt_leitungNr,
+                    "txt_ergebnisDP" : self.txt_l_ergebnisDP,
+                    "button_zoom" : self.button_zoom_leitung,
+                    "button_protokoll_video" : self.button_l_protokoll_video
                 },
                 "variablen": {
                     "layer_protokolle" : "Inspektionsdaten_Leitung",
@@ -272,7 +287,7 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
             "allgemein": {
                     "trennzeichen" : saved_dict["trennzeichen"],
                     "datum" : saved_dict["datum"],
-                    "case_grossklein" : saved_dict["case_grossklein"],
+                    "case_bezeichnung" : saved_dict["case_bezeichnung"],
                     "case_attribut" : saved_dict["case_attribut"],
                     "case_typ" : saved_dict["case_typ"],
                     "zoom_massstab" : saved_dict["zoom_massstab"],
@@ -287,20 +302,34 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                 typ_dict = self.setup_dict[typ]
                 if QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]) == None:
                     self.tabWidget.removeTab(typ_dict["variablen"]["tab_id"])
+                    typ_dict["vorhanden"] = False
                     continue
+
                 else:
+                    typ_dict["vorhanden"] = True
                     if QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]).isValid():
                         self.layer_object[typ] = QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"])
                         self.layer_object[f"{typ}_clone"] = QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]).clone()
                 if typ_dict["variablen"]["bezeichnung_protokoll"][0] == "":
                     for element in typ_dict["ui"]["protokoll"].values():
                         element.hide()
+                    typ_dict["ui"]["protokoll"]["vorhanden"] = False
+                else:
+                    typ_dict["ui"]["protokoll"]["vorhanden"] = True
+
                 if typ_dict["variablen"]["bezeichnung_dp"][0] == "":
                     for element in typ_dict["ui"]["dp"].values():
                         element.hide()
+                    typ_dict["ui"]["bezeichnung_dp"]["vorhanden"] = False
+                else:
+                    typ_dict["ui"]["bezeichnung_dp"]["vorhanden"] = True
+
                 if typ_dict["variablen"]["bezeichnung_video"][0] == "":
                     for element in typ_dict["ui"]["video"].values():
                         element.hide()
+                    typ_dict["ui"]["bezeichnung_video"]["vorhanden"] = False
+                else:
+                    typ_dict["ui"]["bezeichnung_video"]["vorhanden"] = True
 
         self.features = {}
 
@@ -317,78 +346,16 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         self.iface.mapCanvas().setMapTool(panTool)
         self.deleteLater()
 
-
-    def haltungNr_add_completer(self):
+    def add_completer(self,typ):
         """
-        Fügt einen Completer für QLineEdit der Haltungsnummer für manuelle Eingabe ein
+        Fügt einen Completer für QLineEdit des eindeutigen Objektnamen für manuelle Eingabe ein
         """
-        haltungNr_idx = self.layer_object["haltung"].fields().indexOf(self.variablen["attribut_haltungNr"])
-        haltungen = sorted(self.layer_object["haltung"].uniqueValues(haltungNr_idx))
-        haltungen = [element for element in haltungen if not isinstance(element,QVariant)]
-        completer = QCompleter(haltungen)
+        id_idx = self.layer_object[typ].fields().indexOf(self.setup_dict[typ]["variablen"]["attribut_id"])
+        objekte = sorted(self.layer_object[typ].uniqueValues(id_idx))
+        objekte = [element for element in objekte if not isinstance(element,QVariant)]
+        completer = QCompleter(objekte)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.txt_haltungNr.setCompleter(completer)
-
-    def schachtNr_add_completer(self):
-        """
-        Fügt einen Completer für QLineEdit der Schachtnummer für manuelle Eingabe ein
-        """
-        schachtNr_idx = self.layer_object["schacht"].fields().indexOf(self.variablen["attribut_schachtNr"])
-        schacht = sorted(self.layer_object["schacht"].uniqueValues(schachtNr_idx))
-        schacht = [element for element in schacht if not isinstance(element,QVariant)]
-        completer = QCompleter(schacht)
-        completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.txt_schachtNr.setCompleter(completer)
-    
-    def leitungNr_add_completer(self):
-        """
-        Fügt einen Completer für QLineEdit der Leitungsnummer für manuelle Eingabe ein
-        """
-        leitungNr_idx = self.layer_object["leitung"].fields().indexOf(self.variablen["attribut_leitungNr"])
-        leitungen = sorted(self.layer_object["leitung"].uniqueValues(leitungNr_idx))
-        leitungen = [element for element in leitungen if not isinstance(element,QVariant)]
-        completer = QCompleter(leitungen)
-        completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.txt_leitungNr.setCompleter(completer)
-
-    def load_attribute_names_to_dict(self):
-        """
-        Definiert dictionaries mit allen nötigen attributbezeichnungen
-        """
-        self.setup_dict = json.loads(QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('Kanalmanagement_Setup'))
-        self.variablen = {}
-        self.variablen["db_kanal_path"] = allg_dict["db_kanal_path"]
-        self.variablen["db_sanierung_path"] = self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"]
-        self.variablen["db_protokolle"] = protokolle_dict["db_protokolle_path"]
-        self.variablen["layer_haltung"] = "KaHaltung"
-        self.variablen["layer_schacht"] = "KaSchacht"
-        self.variablen["layer_leitung"] = "KaLeitung"
-        self.variablen["attribut_haltungNr"] = "HaltungNr"
-        self.variablen["attribut_schachtNr"] = "SchachtNr"
-        self.variablen["attribut_leitungNr"] = "LeitungNr"
-        self.variablen["layer_haltung_name"] = "Haltung"
-        self.variablen["layer_protokolle_haltung"] = "Inspektionsdaten_Haltung"
-        self.variablen["layer_protokolle_schacht"] = "Inspektionsdaten_Schacht"
-        self.variablen["layer_protokolle_leitung"] = "Inspektionsdaten_Haltung"
-        self.variablen["attribut_ergebnisDP"] = "ErgebnisDP"
-        #self.variablen["attribut_zustandsklasse"] = "Haltungsklasse"
-        #self.variablen["attribut_zustandsklasse_schacht"] = "Schachtklasse"
-        #self.variablen["attribut_aktuellstesUdatum"] = "AktuellstesUDatum"
-
-        # muss noch verbessert werden, sodass der layer eindeutig ist
-        self.layer_object = {}
-        #self.layer_object["haltung"] = QgsProject.instance().mapLayersByName(self.variablen["layer_haltung_name"])[0]
-        self.layer_object["haltung"] = QgsProject.instance().mapLayer(allg_dict["Haltung_layer_id"]).clone()
-        self.layer_object["schacht"] = QgsProject.instance().mapLayer(allg_dict["Schacht_layer_id"]).clone()
-        #leitung kann aber muss nicht definiert sein
-        try:
-            self.layer_object["leitung"] = QgsProject.instance().mapLayer(allg_dict["Leitung_layer_id"]).clone()
-            self.leitung_defined = True
-        except:
-            self.leitung_defined = False
-
-        #dict in das features gespeichert werden
-        self.features = {}
+        self.setup_dict[typ]["ui"]["txt_nr"].setCompleter(completer)
 
     def select_object(self, selection_layer, name_shown, object_type):
         """
@@ -398,225 +365,138 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                                     name_shown = name_shown, #Attribut das in Auswahl angezeigt wird
                                     selection_layer = selection_layer
                                     )
-        #self.selection.featureIdentified.connect(self.con)
+
         self.selection.objectFound.connect(lambda feature, object_type = object_type: self.feature_selected(feature, object_type))
         self.iface.mapCanvas().setMapTool(self.selection)
-
-        #self.identify = QgsMapToolIdentifyFeature(self.iface.mapCanvas(), self.layer_object["haltung"])
-        #self.identify.featureIdentified.connect(self.con)
-        
-        #self.iface.mapCanvas().setMapTool(self.identify)
     
     def feature_selected(self,feature, object_type):
-        if object_type == "Haltung":
-            self.features["haltung"] = feature
-        elif object_type == "Schacht":
-            self.features["schacht"] = feature
-        elif object_type == "Leitung":
-            self.features["leitung"] = feature
+        self.features[typ] = feature
         self.load_layer(object_type = object_type)
     
-    def change_col_haltungNr(self,text,valid=None):
+    def change_txt_col(self,typ, valid =None):
         if valid != None:
-            self.txt_haltungNr.setStyleSheet("")
-            self.button_zoom_haltung.setEnabled(True)
+            self.setup_dict[typ]["ui"]["txt_nr"].setStyleSheet("")
+            self.setup_dict[typ]["ui"]["button_zoom"].setEnabled(True)
         else:
-            self.txt_haltungNr.setStyleSheet("QLineEdit::editable {background-color: orange;}")
-            self.button_zoom_haltung.setEnabled(False)
-        
-    def change_col_schachtNr(self,text,valid=None):
-        if valid != None:
-            self.txt_schachtNr.setStyleSheet("")
-            self.button_zoom_schacht.setEnabled(True)
-        else:
-            self.txt_schachtNr.setStyleSheet("QLineEdit::editable {background-color: orange;}")
-            self.button_zoom_schacht.setEnabled(False)
-    
-    def change_col_leitungNr(self,text,valid=None):
-        if valid != None:
-            self.txt_leitungNr.setStyleSheet("")
-            self.button_zoom_leitung.setEnabled(True)
-        else:
-            self.txt_leitungNr.setStyleSheet("QLineEdit::editable {background-color: orange;}")
-            self.button_zoom_leitung.setEnabled(False)
-        
+            self.setup_dict[typ]["ui"]["txt_nr"].setStyleSheet("QLineEdit::editable {background-color: orange;}")
+            self.setup_dict[typ]["ui"]["button_zoom"].setEnabled(False)
+
     def load_layer_from_textField(self, object_type):
         self.setCursor(Qt.WaitCursor)
-        if object_type == "Haltung":
-            filter = self.layer_object["haltung"].subsetString()
-            self.layer_object["haltung"].setSubsetString(f"{self.variablen['attribut_haltungNr']}='{self.txt_haltungNr.text()}'")
-            print(self.layer_object["haltung"].subsetString())
-            if self.layer_object["haltung"].featureCount() == 1:
-                haltung_feature = QgsFeature()
-                self.layer_object["haltung"].getFeatures().nextFeature(haltung_feature)
-                self.features["haltung"] = haltung_feature
-                self.load_layer(load_from_txt_field = True, object_type = object_type)
-                self.change_col_haltungNr(text = "", valid = True)
-                #self.txt_haltungNr.setText(self.features["haltung"].attribut(self.variablen["attribut_haltungNr"]))
-            else:
-                self.clear_all()
-                self.iface.messageBar().pushMessage("Haltung nicht gefunden.", "Die angegebene Haltungsnummer ist ungültig.", level=Qgis.Warning, duration=2)
-                self.button_zoom_haltung.setEnabled(False)
-            self.layer_object["haltung"].setSubsetString(filter)
-        elif object_type == "Schacht":
-            filter = self.layer_object["schacht"].subsetString()
-            self.layer_object["schacht"].setSubsetString(f"{self.variablen['attribut_schachtNr']}='{self.txt_schachtNr.text()}'")
-            if self.layer_object["schacht"].featureCount() == 1:
-                schacht_feature = QgsFeature()
-                self.layer_object["schacht"].getFeatures().nextFeature(schacht_feature)
-                self.features["schacht"] = schacht_feature
-                self.load_layer(load_from_txt_field = True, object_type = object_type)
-                self.change_col_schachtNr(text = "", valid = True)
-            else:
-                self.clear_all()
-                self.iface.messageBar().pushMessage("Schacht nicht gefunden.", "Die angegebene Schachtnummer ist ungültig.", level=Qgis.Warning, duration=2)
-                self.button_zoom_schacht.setEnabled(False)
-            self.layer_object["schacht"].setSubsetString(filter)
-        elif object_type == "Leitung":
-            filter = self.layer_object["leitung"].subsetString()
-            self.layer_object["leitung"].setSubsetString(f"{self.variablen['attribut_leitungNr']}='{self.txt_leitungNr.text()}'")
-            if self.layer_object["leitung"].featureCount() == 1:
-                leitung_feature = QgsFeature()
-                self.layer_object["leitung"].getFeatures().nextFeature(leitung_feature)
-                self.features["leitung"] = leitung_feature
-                self.load_layer(load_from_txt_field = True, object_type = object_type)
-                self.change_col_leitungNr(text = "", valid = True)
-            else:
-                self.clear_all()
-                self.iface.messageBar().pushMessage("Leitung nicht gefunden.", "Die angegebene Leitungsnummer ist ungültig.", level=Qgis.Warning, duration=2)
-                self.button_zoom_leitung.setEnabled(False)
-            self.layer_object["leitung"].setSubsetString(filter)
+        objekt = self.setup_dict[object_type]
+        filter = self.layer_object[object_type].subsetString()
+        self.layer_object[object_type].setSubsetString(f"{object["variablen"]['attribut_id']}='{object["ui"]["txt_nr"].text()}'")
 
+        error_msg = {
+            "haltung" : ["Haltung nicht gefunden", "Die angegebene Haltungsnummer ist ungültig."],
+            "schacht" : ["Schacht nicht gefunden", "Die angegebene Schachtnummer ist ungültig."]
+            "leitung" : ["Leitung nicht gefunden", "Die angegebene Leitungsnummer ist ungültig."]
+        }
+        if self.layer_object[object_type].featureCount() == 1:
+            feature = QgsFeature()
+            self.layer_object[object_type].getFeatures().nextFeature(feature)
+            self.features[object_type] = feature
+            self.load_layer(load_from_txt_field = True, object_type = object_type)
+            self.change_txt_col(object_type, valid = True)
+        else:
+            self.clear_all()
+            self.iface.messageBar().pushMessage(error_msg[object_type][0],error_msg[object_type][1], level=Qgis.Warning, duration=2)
+            self.setup_dict[object_type]["ui"]["button_zoom"].setEnabled(True)
+        self.layer_object[object_type].setSubsetString(filter)
+        
         self.setCursor(Qt.ArrowCursor)
 
-    def load_layer(self, object_type, load_from_txt_field = False):
-        if object_type == "Haltung":            
-            if not load_from_txt_field:
-                self.txt_haltungNr.setText(self.features["haltung"].attribute(self.variablen["attribut_haltungNr"]))
-            self.change_col_haltungNr(text = "", valid = True)        
-            
+    def load_layer(self, object_type, load_from_txt_field = False): 
+        objekt = self.setup_dict[object_type]          
+        if not load_from_txt_field:
+            self.txt_haltungNr.setText(self.features[object_type].attribute(objekt["variablen"]["attribut_id"]))
+        self.change_txt_col(object_type, valid = True)        
+
+        if object["ui"]["dp"]["vorhanden"]:    
             try:
-                ergebnisDP = str(self.features["haltung"].attribute(self.variablen["attribut_ergebnisDP"]))
+                ergebnisDP = str(self.features[object_type].attribute(objekt["variablen"]["ergebnis_dp"]))
             except:
                 ergebnisDP = 'NULL'
             if ergebnisDP == "NULL":
                 ergebnisDP = "keine DP"
-            self.txt_ergebnisDP.setText(ergebnisDP)
-            self.change_col_ergebnisDP()
+            objekt["ui"]["txt_ergebnisDP"].setText(ergebnisDP)
+            self.change_col_ergebnisDP(object_type)
 
-            #zustandsklasse = str(self.features["haltung"].attribute(self.variablen["attribut_zustandsklasse"]))
-            #if zustandsklasse == "NULL":
-            #    zustandsklasse = "-"
-            self.load_haltung.emit()
-        elif object_type == "Schacht":
-            if not load_from_txt_field:
-                self.txt_schachtNr.setText(self.features["schacht"].attribute(self.variablen["attribut_schachtNr"]))
-            self.change_col_schachtNr(text = "", valid = True)        
-
-           # zustandsklasse = str(self.features["schacht"].attribute(self.variablen["attribut_zustandsklasse_schacht"]))
-           # if zustandsklasse == "NULL":
-           #     zustandsklasse = "-"
-            self.load_schacht.emit()
-        if object_type == "Leitung":            
-            if not load_from_txt_field:
-                self.txt_leitungNr.setText(self.features["leitung"].attribute(self.variablen["attribut_leitungNr"]))
-            self.change_col_leitungNr(text = "", valid = True)        
-            
-            try:
-                ergebnisDP = str(self.features["leitung"].attribute(self.variablen["attribut_ergebnisDP"]))
-            except:
-                ergebnisDP = 'NULL'
-            if ergebnisDP == "NULL":
-                ergebnisDP = "keine DP"
-            self.txt_ergebnisDP_leitung.setText(ergebnisDP)
-            self.change_col_ergebnisDP_leitung()
-
-            #self.load_leitung.emit()
+        #self.load_haltung.emit()
 
         self.load_protokolle(object_type)
  
     def clear_all(self):
         # Haltung Tab
-        self.combobox_tv.clear()
-        self.combobox_druck.clear()
-        self.combobox_video.clear()
+        for objekt, ui in self.setup_dict.items():
+            if objekt != "allgemein":
+                for typ in ui.items():
+                    if isinstance(typ,dict):
+                        if typ["vorhanden"]:
+                            typ["txt"].setText("")
+                            typ["combobox"].clear()
+                            typ["button"].setEnabled(False)
+                ui["txt_nr"].setText("")
+                ui["txt_ergebnisDP"].setText("")
+                ui["button_zoom"].setEnabled(False)
+                ui["button_protokoll_video"].setEnabled(False)
 
-        self.txt_tv_anzahl.setText("")
-        self.txt_druck_anzahl.setText("")
-        self.txt_video_anzahl.setText("")
-
-        self.button_tv.setEnabled(False)
-        self.button_druck.setEnabled(False)
-        self.button_video.setEnabled(False)
-        self.button_tv_video.setEnabled(False)
-
-        # Schacht Tab
-        self.combobox_protokoll.clear()
-        self.combobox_video_schacht.clear()
-
-        self.txt_protokoll_anzahl.setText("")
-        self.txt_video_schacht_anzahl.setText("")
-
-        self.button_protokoll.setEnabled(False)
-        self.button_video_schacht.setEnabled(False)
-        self.button_schacht_alles.setEnabled(False)
-
-        #Leitung Tab wenn definiert
-        if self.leitung_defined:
-            self.combobox_tv_leitung.clear()
-            self.combobox_druck_leitung.clear()
-            self.combobox_video_leitung.clear()
-
-            self.txt_tv_anzahl_leitung.setText("")
-            self.txt_druck_anzahl_leitung.setText("")
-            self.txt_video_anzahl_leitung.setText("")
-
-            self.button_tv_leitung.setEnabled(False)
-            self.button_druck_leitung.setEnabled(False)
-            self.button_video_leitung.setEnabled(False)
-            self.button_tv_video_leitung.setEnabled(False)
  
     def zoom_to_object(self,layer, id):
         layer.selectByIds([id], QgsVectorLayer.SetSelection)
         bbox = layer.boundingBoxOfSelected()
         self.iface.mapCanvas().setExtent(bbox)
-        scale = self.setup_dict["zoom_massstab"]
+        scale = self.setup_dict["variablen"]["zoom_massstab"]
         self.iface.mapCanvas().zoomScale(scale)
         self.iface.mapCanvas().refresh()
 
+    ################
+    #
+    # hier weiter coden
+    #
+    ###############
     def load_protokolle(self, object_type):
-        if object_type == "Haltung":
-            protokolle = QgsVectorLayer(self.variablen["db_protokolle"]+"|layername="+self.variablen["layer_protokolle_haltung"], "Protokolle_Haltung", "ogr")
-            protokolle.setSubsetString(f"lower(nr) = lower('{self.txt_haltungNr.text()}')")
+        objekt = self.setup_dict[object_type]
+        protokolle = QgsVectorLayer(self.setup_dict["allgemein"]["db_protokolle_path"]+"|layername="+self.setup_dict[object_type]["variablen"]["layer_protokolle"], "Protokolle", "ogr")
+        if objekt["variablen"]["1_attribut"]:
+            if self.setup_dict["allgemein"]["case_attribut"]:
+                protokolle.setSubsetString(f"lower(attribut1) = lower('{objekt["variablen"]["attribut1"]}')")
+            else:
+                protokolle.setSubsetString(f"attribut1 = '{objekt["variablen"]["attribut1"]}'")
+        else:
+            if self.setup_dict["allgemein"]["case_attribut"]:
+                protokolle.setSubsetString(f"lower(attribut1) = lower('{objekt["variablen"]["attribut1"]}') & lower(attribut2) = lower('{objekt["variablen"]["attribut2"]}')")
+            else:
+                protokolle.setSubsetString(f"attribut1 = '{objekt["variablen"]["attribut1"]}' & attribut2 = '{objekt["variablen"]["attribut2"]}'")
 
-            self.tv_pfad = []
-            self.tv_datum = []
-                
-            self.video_pfad = []
-            self.video_datum = []
-                
-            self.druck_pfad = []
-            self.druck_datum = []
+        self.tv_pfad = []
+        self.tv_datum = []
+            
+        self.video_pfad = []
+        self.video_datum = []
+            
+        self.druck_pfad = []
+        self.druck_datum = []
 
-            for feature in protokolle.getFeatures():
-                if "protokoll" in feature.attribute("bez"):
-                    self.tv_pfad.append(feature.attribute("pfad"))
-                    if feature.attribute("datum") != '':
-                        self.tv_datum.append(feature.attribute("datum"))
-                    else:
-                        self.tv_datum.append("1900-01-01 00:00:00") # wenn datum fehlt
-                elif "video" in feature.attribute("bez"):
-                    self.video_pfad.append(feature.attribute("pfad"))
-                    if feature.attribute("datum") != '':
-                        self.video_datum.append(feature.attribute("datum"))
-                    else:
-                        self.video_datum.append("1900-01-01 00:00:00")
-                elif "druck" in feature.attribute("bez"):
-                    self.druck_pfad.append(feature.attribute("pfad"))
-                    if feature.attribute("datum") != '':
-                        self.druck_datum.append(feature.attribute("datum"))
-                    else:
-                        self.druck_datum.append("1900-01-01 00:00:00")
+        for feature in protokolle.getFeatures():
+            if feature.attribute("bezeichnung") in objekt["variablen"]["bezeichnung_protokoll"]:
+                self.tv_pfad.append(feature.attribute("pfad"))
+                if feature.attribute("datum") != '':
+                    self.tv_datum.append(feature.attribute("datum"))
+                else:
+                    self.tv_datum.append("1900-01-01 00:00:00") # wenn datum fehlt
+            elif "video" in feature.attribute("bez"):
+                self.video_pfad.append(feature.attribute("pfad"))
+                if feature.attribute("datum") != '':
+                    self.video_datum.append(feature.attribute("datum"))
+                else:
+                    self.video_datum.append("1900-01-01 00:00:00")
+            elif "druck" in feature.attribute("bez"):
+                self.druck_pfad.append(feature.attribute("pfad"))
+                if feature.attribute("datum") != '':
+                    self.druck_datum.append(feature.attribute("datum"))
+                else:
+                    self.druck_datum.append("1900-01-01 00:00:00")
 
             self.tv_datum_strp = self.tv_datum
             self.video_datum_strp = self.video_datum
@@ -883,22 +763,13 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
                 QMessageBox.warning(self,"Fehler!",f"Datei<br><b>{file3}</b><br>konnte nicht geöffnet werden.<br>Womöglich wurde die Datei verschoben.<br>Funktion 'Inspektionsdaten verknüpfen' erneut ausführen und neue Datenbank erstellen'")
 
 
-    def change_col_ergebnisDP(self):
-        if "undicht" in self.txt_ergebnisDP.text():
-            self.txt_ergebnisDP.setStyleSheet("QLabel {background-color: #ff3030;}")
-        elif "dicht" in self.txt_ergebnisDP.text().lower():
-            self.txt_ergebnisDP.setStyleSheet("QLabel {background-color: #aaff00;}")
-        elif "keine" in self.txt_ergebnisDP.text() or "nicht" in self.txt_ergebnisDP.text():
-            self.txt_ergebnisDP.setStyleSheet("QLabel {background-color: orange;}")
+    def change_col_ergebnisDP(self, object_type):
+        txt = self.setup_dict[object_type]["ui"]["txt_ergebnisDP"].text().lower()
+        if "undicht" in txt:
+            txt.setStyleSheet("QLabel {background-color: #ff3030;}")
+        elif "dicht" in txt:
+            txt.setStyleSheet("QLabel {background-color: #aaff00;}")
+        elif "keine" in txt or "nicht" in txt:
+            txt.setStyleSheet("QLabel {background-color: orange;}")
         else:
-            self.txt_ergebnisDP.setStyleSheet("")
-    
-    def change_col_ergebnisDP_leitung(self):
-        if "undicht" in self.txt_ergebnisDP_leitung.text():
-            self.txt_ergebnisDP_leitung.setStyleSheet("QLabel {background-color: #ff3030;}")
-        elif "dicht" in self.txt_ergebnisDP_leitung.text().lower():
-            self.txt_ergebnisDP_leitung.setStyleSheet("QLabel {background-color: #aaff00;}")
-        elif "keine" in self.txt_ergebnisDP_leitung.text() or "nicht" in self.txt_ergebnisDP_leitung.text():
-            self.txt_ergebnisDP_leitung.setStyleSheet("QLabel {background-color: orange;}")
-        else:
-            self.txt_ergebnisDP_leitung.setStyleSheet("")
+            self.setup_dict[object_type]["ui"]["txt_ergebnisDP"].setStyleSheet("")

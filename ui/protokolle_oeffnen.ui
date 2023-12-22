@@ -20,7 +20,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="haltung">
        <attribute name="title">
         <string>Haltung</string>
        </attribute>
@@ -354,7 +354,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="schacht">
        <attribute name="title">
         <string>Schacht</string>
        </attribute>
@@ -652,7 +652,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="leitung">
        <attribute name="title">
         <string>Leitung</string>
        </attribute>

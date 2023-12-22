@@ -24,12 +24,13 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.core import QgsProject
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 #from .document_connector_dialog import DocumentConnectorDialog
-from .code.Einstellungen import Einstellungen
+from .code.Einstellungen import Einstellungen, InputChecker
 from .code.ProtokolleVerknuepfen import Link
 from .code.ProtokolleOeffnen import Open
 import os.path
@@ -72,6 +73,7 @@ class DocumentConnector:
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
         self.protokolleOeffnenisActive = False
+        QgsProject.instance().homePathChanged.connect(self.checkInput)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -99,7 +101,8 @@ class DocumentConnector:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+        check_input = False):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -158,8 +161,10 @@ class DocumentConnector:
             self.iface.addPluginToMenu(
                 self.menu,
                 action)
-
+        
+        action.check_input = check_input
         self.actions.append(action)
+
 
         return action
 
@@ -182,16 +187,19 @@ class DocumentConnector:
             os.path.join(icon_dir,"link.png"),
             text=self.tr(u'Dateien verknüpfen'),
             callback=self.run_link,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+            check_input = True)
         
         self.add_action(
             os.path.join(icon_dir,"kamera.png"),
             text=self.tr(u'Dateien öffnen'),
             callback=self.run_open,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+            check_input = True)
 
         # will be set False in run()
         self.first_start = True
+        self.checkInput()
 
 
     def unload(self):
@@ -224,6 +232,7 @@ class DocumentConnector:
 
     def run_einstellungen(self):
         dlg = Einstellungen(self.iface)
+        dlg.okpressed.connect(self.checkInput)
         dlg.show()
         dlg.exec_()
     
@@ -256,3 +265,11 @@ class DocumentConnector:
         self.protokolleWidget.closingPlugin.disconnect(self.onCloseProtokolleDockWidget)
         self.protokolleWidget = None
         self.protokolleOeffnenisActive = False
+    
+    def checkInput(self):
+        checker = InputChecker()
+        ergebnis = checker.check_input()
+        for action in self.actions:
+            if action.check_input:
+                action.setEnabled(ergebnis)
+

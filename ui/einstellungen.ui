@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1277</width>
-    <height>650</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,22 +30,6 @@
           <string/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>15</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Datenbank (*.gpkg) mit Geometriedaten wählen</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QgsFileWidget" name="file_geometrie"/>
-          </item>
           <item>
            <layout class="QGridLayout" name="gridLayout_5">
             <property name="topMargin">
@@ -193,7 +177,7 @@
             <item row="1" column="1">
              <widget class="QSpinBox" name="spinbox_zoom">
               <property name="minimum">
-               <number>100</number>
+               <number>10</number>
               </property>
               <property name="maximum">
                <number>2500</number>
@@ -807,8 +791,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

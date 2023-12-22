@@ -141,15 +141,27 @@ class Link(QtWidgets.QDialog, FORM_CLASS):
             # 1 attribut: typ an 2.stelle
             # 2 attribute: typ an 3.stelle
             typ_liste = self.setup_dict["haltung"]["typ"] + self.setup_dict["schacht"]["typ"] + self.setup_dict["leitung"]["typ"]
-            try:
-                if text_glieder[1] in typ_liste: #typ passt an 2. stelle
-                    attribute = 1
-                elif text_glieder[2] in typ_liste: #typ passt an 3. stelle
-                    attribute = 2
-                else:
+            if not self.setup_dict["case_typ"]:
+                try:
+                    if text_glieder[1] in typ_liste: #typ passt an 2. stelle
+                        attribute = 1
+                    elif text_glieder[2] in typ_liste: #typ passt an 3. stelle
+                        attribute = 2
+                    else:
+                        continue #datei nicht relevant
+                except:
                     continue #datei nicht relevant
-            except:
-                continue #datei nicht relevant
+            else:
+                typ_liste = [i.lower() for i in typ_liste]
+                try:
+                    if text_glieder[1].lower() in typ_liste: #typ passt an 2. stelle
+                        attribute = 1
+                    elif text_glieder[2].lower() in typ_liste: #typ passt an 3. stelle
+                        attribute = 2
+                    else:
+                        continue #datei nicht relevant
+                except:
+                    continue #datei nicht relevant
 
             if len(text_glieder) > 2 + attribute:
                 objekt["pfad"].append(f)

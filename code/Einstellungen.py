@@ -482,131 +482,32 @@ class InputChecker():
         try:
             self.setup_dict = json.loads(QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('Dokumente_Setup'))
         except:
-            return False, False, False, None
+            return False
+
+        if self.setup_dict["trennzeichen"] == "" or \
+            self.setup_dict["datum"] == "" or \
+            not os.path.isfile(self.setup_dict["db_protokolle_path"]):
+            return False
+
+        typ_dict = {
+            "haltung" : False,
+            "schacht" : False,
+            "leitung" : False
+        }
+        for typ in typ_dict.keys():
+            d = self.setup_dict[typ]
+            if QgsProject.instance().mapLayer(d["layer_id"]) != None and \
+                d["attribut_id"] != "" and \
+                d["typ"] != "" and \
+                d["attribut1"] != "":
+                typ_dict[typ] = True
+            
+            if not d["1_attribut"] and d["attribut2"] == "":
+                typ_dict[typ] = False
         
-        # chek allgemeine einstellungen
-        allg_einstellungen = True
-        try:
-            # maßstab muss > 0 sein
-            if self.setup_dict["allg_einstellungen"]["zoom_massstab"] <= 0:
-                allg_einstellungen = False
-
-            # haltunglayer und schachtlayer müssen vorhanden sein
-            if QgsProject.instance().mapLayer(self.setup_dict["allg_einstellungen"]["Haltung_layer_id"]) == None or \
-            QgsProject.instance().mapLayer(self.setup_dict["allg_einstellungen"]["Schacht_layer_id"]) == None:
-                allg_einstellungen = False
-            
-            #check if db is file
-            if not os.path.isfile(self.setup_dict["allg_einstellungen"]["db_kanal_path"]):
-                allg_einstellungen = False
-            
-            # ka haltung muss in datenbank vorhanden sein
-            if not QgsVectorLayer(self.setup_dict["allg_einstellungen"]["db_kanal_path"]+"|layername=KaHaltung", "Haltung", "ogr").isValid():
-                allg_einstellungen = False
-        except:
-            allg_einstellungen = False
-        #check detailsanierungseinstellungen
-        detailsanierungsplanung = True
-        san_db = None
-        #try:
-        # datei muss vorhanden sein
-        san_db = self.setup_dict["detailsanierungsplanung_setup"]["db_sanierung_path"]
-        if not os.path.isfile(san_db):
-            detailsanierungsplanung = False
+        if True in typ_dict.values():
+            return True
         else:
-            # san_db muss inhaltlich korrekt sein
-            detailsanierungsplanung = self.check_san_db_aktuell(san_db)
-        # variantenauswahl und sanierungsmethoden müssen definiert sein
-        if not all(x in self.setup_dict["detailsanierungsplanung_setup"].keys() for x in ("variantenauswahl","sanierungsmethoden")):
-            detailsanierungsplanung = False
-            
-        """layer_namen = ["Haltungen_Massnahmen", "Sanierungsmassnahmen","Sanierungsbibliothek",
-                        "Schacht_Sanierungskonzept","Haltung_Sanierungskonzept"]
-        for layer in layer_namen:
-            if not QgsVectorLayer(san_db+f"|layername={layer}", layer, "ogr"):
-                detailsanierungsplanung = False"""
-        #except:
-        #    detailsanierungsplanung = False
-
-        # check protokolle input
-        protokolle = True
-        try:
-            if not os.path.isfile(self.setup_dict["protokolle_setup"]["db_protokolle_path"]):
-                protokolle = False
-
-            layer_namen = ["Inspektionsdaten_Haltung", "Inspektionsdaten_Schacht"]
-            for layer in layer_namen:
-                if not QgsVectorLayer(self.setup_dict["protokolle_setup"]["db_protokolle_path"]+f"|layername={layer}", layer, "ogr").isValid():
-                    protokolle = False
-        except:
-            protokolle = False
-
-        return allg_einstellungen, protokolle, detailsanierungsplanung, san_db
+            return False
 
 
-    def get_layer_dict(self,db):
-        if os.path.isfile(db):
-            sublayers = fiona.listlayers(db)
-
-            layers_dict = {}
-            for sublayer in sublayers:
-                uri = f"{db}|layername={sublayer}"
-                # Create layer
-                sub_vlayer = QgsVectorLayer(uri, sublayer, 'ogr')
-                # add to dict
-                fields = {}
-                for field in sub_vlayer.fields():
-                    fields[field.name()] = [field.typeName(),field.type()]
-                layers_dict[sub_vlayer.name()] = fields
-            return layers_dict
-
-    def check_san_db_aktuell(self, san_db):
-        original_db = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","development","Sanierungsdatenbank.gpkg"))
-        original_dict = self.get_layer_dict(original_db)
-        san_dict = self.get_layer_dict(san_db)
-        db_ok = True
-        layer_fehlt = []
-        for original_layer in original_dict.keys():
-            if original_layer in san_dict:
-                for attribute_name in original_dict[original_layer].keys():
-                    #wenn attributname nicht in verknüpfter db ist
-                    if not attribute_name in san_dict[original_layer]:
-                        #userinput fragen
-                        fortfahren =QMessageBox.warning(None,"Kanalmanagement-Plugin!",f"Das Attribut <b>{attribute_name}</b> fehlt im Layer <b>{original_layer}</b> in der Sanierungsdatenbank.<br><br>Datenbank: <b>{san_db}</b><br>Layer: <b>{original_layer}</b><br>Attribut: <b>{attribute_name}</b><br>Datentyp: <b>{original_dict[original_layer][attribute_name][0]}</b><br><br>Soll das Attribut eingefügt werden? (empfohlen)", QMessageBox.Yes|QMessageBox.No)
-                        #wenn bestätigt dann neues attribut einfügen
-                        if fortfahren == QMessageBox.Yes:
-                            layer = QgsVectorLayer(f"{san_db}|layername={original_layer}",original_layer,"ogr")
-                            pr = layer.dataProvider()
-                            pr.addAttributes([QgsField(attribute_name,original_dict[original_layer][attribute_name][1])])
-                            layer.updateFields()
-                            print(f"Attribut fehlt! {attribute_name}")
-                        else:
-                            db_ok = False
-                    else:
-                        if original_dict[original_layer][attribute_name][0] != san_dict[original_layer][attribute_name][0]:
-                            QMessageBox.warning(None,"Kanalmanagement-Plugin!",f"Das Attribut <b>{attribute_name}</b> im Layer <b>{original_layer}</b> hat den falschen Datentyp!<br><br> Um Datenverlust zu vermeiden bitte manuell korrigieren.<br><br>Layer: <b>{original_layer}</b><br>Attribut: <b>{attribute_name}</b><br>Datentyp soll: <b>{original_dict[original_layer][attribute_name][0]}</b><br>Datentyp ist: <b>{san_dict[original_layer][attribute_name][0]}", QMessageBox.Cancel)
-                            return False
-            else:
-                layer_fehlt.append(original_layer)
-            
-        if len(layer_fehlt) > 0:
-            if len(layer_fehlt) > 1:
-                txt_fehlt = "fehlen"
-                txt_falsch = "Durch die Anzahl an fehlenden Layern besteht die Möglichkeit, dass eine falsche Datenbank verknüpft ist.<br><br>"
-            else:
-                txt_fehlt = "fehlt"
-                txt_falsch = ""
-            layer_txt = "<br>".join(layer_fehlt)
-            fortfahren = QMessageBox.warning(None,"Kanalmanagement-Plugin!",f"In der Sanierungsdatenbank {txt_fehlt} {len(layer_fehlt)} Layer.<br><br>Aktuell ist die Datenbank <b>{san_db}</b> mit dem Projekt verknüpft.<br><br>{txt_falsch}Sollen folgende Layer erstellt werden:<br><b>{layer_txt}</b>", QMessageBox.Yes|QMessageBox.No)
-            if fortfahren == QMessageBox.Yes:
-                for layer_erstellen in layer_fehlt:
-                    print(layer_erstellen)
-                    layer = QgsVectorLayer(f"{original_db}|layername={layer_erstellen}",layer_erstellen,"ogr")
-                    options = QgsVectorFileWriter.SaveVectorOptions()
-                    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-                    options.layerName = layer_erstellen
-                    _writer = QgsVectorFileWriter.writeAsVectorFormat(layer, san_db, options)
-            else:
-                db_ok = False
-
-        return db_ok

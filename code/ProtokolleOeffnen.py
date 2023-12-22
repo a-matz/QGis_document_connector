@@ -331,11 +331,13 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         }
 
         self.layer_object = {}
+        del_tabs = []
         for typ, values in self.setup_dict.items():
             if typ != "allgemein":
                 typ_dict = self.setup_dict[typ]
                 if QgsProject.instance().mapLayer(typ_dict["variablen"]["layer_id"]) == None:
-                    self.tabWidget.removeTab(typ_dict["variablen"]["tab_id"])
+                    #self.tabWidget.removeTab(typ_dict["variablen"]["tab_id"])
+                    del_tabs.append(typ_dict["variablen"]["tab_id"])
                     typ_dict["vorhanden"] = False
                     continue
 
@@ -368,6 +370,9 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.features = {}
 
+        for nr in sorted(del_tabs, reverse = True):
+            self.tabWidget.removeTab(nr)
+
         
         
 
@@ -387,7 +392,7 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
         """
         id_idx = self.layer_object[typ].fields().indexOf(self.setup_dict[typ]["variablen"]["attribut_id"])
         objekte = sorted(self.layer_object[typ].uniqueValues(id_idx))
-        objekte = [element for element in objekte if not isinstance(element,QVariant)]
+        objekte = [str(element) for element in objekte if not isinstance(element,QVariant)]
         completer = QCompleter(objekte)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.setup_dict[typ]["ui"]["txt_nr"].setCompleter(completer)
@@ -427,9 +432,9 @@ class Open(QtWidgets.QDockWidget, FORM_CLASS):
             "leitung" : ["Leitung nicht gefunden", "Die angegebene Leitungsnummer ist ungültig."]
         }
 
-        if self.layer_object[object_type].featureCount() == 1:
+        if self.layer_object[f"{object_type}_clone"].featureCount() == 1:
             feature = QgsFeature()
-            self.layer_object[object_type].getFeatures().nextFeature(feature)
+            self.layer_object[f"{object_type}_clone"].getFeatures().nextFeature(feature)
             self.features[object_type] = feature
             self.load_layer(load_from_txt_field = True, object_type = object_type)
             self.change_txt_col(object_type, valid = True)

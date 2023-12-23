@@ -75,7 +75,11 @@ class Link(QtWidgets.QDialog, FORM_CLASS):
 
     def check_input(self):
         if os.path.isdir(self.directory_files.filePath()) and os.path.isdir(os.path.dirname(self.directory_outputDB.filePath())):
-            self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
+            if self.setup_dict["trennzeichen"] == "" or self.setup_dict["datum"] == "":
+                QMessageBox.warning(self,"Fehler", "Trennzeichen oder Datumsformat in den Einstellungen nicht definiert.")
+                self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
+            else:
+                self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
         else:
             self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
 
@@ -105,6 +109,12 @@ class Link(QtWidgets.QDialog, FORM_CLASS):
         options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer 
         options.layerName = tabelle
         _writer = QgsVectorFileWriter.writeAsVectorFormat(out_layer, db, options)
+    
+    def check_einstellungen(self):
+        if self.setup_dict["trennzeichen"] == "" or \
+            self.setup_dict["datum"] == "":
+            QMessageBox.information(self,"Information", "Protokolle erfolgreich eingelesen.")
+
 
     
     def accept(self):        
@@ -198,7 +208,10 @@ class Link(QtWidgets.QDialog, FORM_CLASS):
             #prog.setValue(i)
                     
         df = pd.DataFrame.from_dict(objekt)
-        df = df[~df.endung.isin(self.setup_dict["ignorieren"])]
+        #endung nicht case sensitive
+        df["endung"] = df["endung"].str.lower()
+        ignore = [i.lower() for i in self.setup_dict["ignorieren"]]
+        df = df[~df.endung.isin(ignore)]
 
         if self.setup_dict["case_bezeichnung"]:
             df["bezeichnung"] = df["bezeichnung"].str.lower()

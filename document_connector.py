@@ -23,7 +23,7 @@
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction, QDockWidget
 from qgis.core import QgsProject
 
 # Initialize Qt resources from file resources.py
@@ -187,8 +187,7 @@ class DocumentConnector:
             os.path.join(icon_dir,"link.png"),
             text=self.tr(u'Dateien verknüpfen'),
             callback=self.run_link,
-            parent=self.iface.mainWindow(),
-            check_input = True)
+            parent=self.iface.mainWindow())
         
         self.add_action(
             os.path.join(icon_dir,"kamera.png"),
@@ -233,16 +232,18 @@ class DocumentConnector:
     def run_einstellungen(self):
         dlg = Einstellungen(self.iface)
         dlg.okpressed.connect(self.checkInput)
+        dlg.okpressed.connect(self.reload_open)
         dlg.show()
         dlg.exec_()
     
     def run_link(self):
         dlg = Link()
+        dlg.okpressed.connect(self.checkInput)
         dlg.show()
         dlg.exec_()
     
     def run_open(self):
-        #pass
+
         if not self.protokolleOeffnenisActive:
             self.protokolleOeffnenisActive = True
             # Create the dockwidget (after translation) and keep reference
@@ -260,12 +261,19 @@ class DocumentConnector:
     
     def onCloseProtokolleDockWidget(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
-
         # disconnects
         self.protokolleWidget.closingPlugin.disconnect(self.onCloseProtokolleDockWidget)
         self.protokolleWidget = None
         self.protokolleOeffnenisActive = False
     
+    def reload_open(self):
+        for dlg in self.iface.mainWindow().findChildren(QDockWidget):
+            if dlg.objectName() == "oeffnen_dlg":
+                dlg.deleteLater()
+                self.onCloseProtokolleDockWidget()
+                self.run_open()
+                return
+            
     def checkInput(self):
         checker = InputChecker()
         ergebnis = checker.check_input()

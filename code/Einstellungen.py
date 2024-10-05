@@ -26,14 +26,9 @@ import os
 import json
 from qgis.PyQt.QtCore import  Qt, QVariant,pyqtSignal, QSignalBlocker #, QRegExp, QLine, pyqtSignal, ,
 from qgis.PyQt import QtGui, QtWidgets, uic
-#from qgis.utils import iface
-#from qgis.gui import QgsMessageBar
-from qgis.core import QgsMapLayerProxyModel,QgsExpressionContextUtils, QgsProject, QgsVectorLayer, QgsVectorFileWriter, QgsField, Qgis
-from qgis.PyQt.QtWidgets import QDialog, QMessageBox, QDialogButtonBox, QPushButton
+from qgis.core import QgsMapLayerProxyModel,QgsExpressionContextUtils, QgsProject
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from osgeo import ogr
-import fiona
-import shutil
-import sqlite3
 
 # eigene klassen
 

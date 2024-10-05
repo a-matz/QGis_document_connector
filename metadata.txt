@@ -6,7 +6,7 @@
 name=Dokumente verknüpfen
 qgisMinimumVersion=3.28
 description=With this Plugin documents can be connected to objects. It is designed for sewer system inspection data.
-version=0.1
+version=1.0
 author=Armin Matzl
 email=arminmatzl@gmail.com
 
@@ -29,7 +29,7 @@ homepage=https://github.com/a-matz/QGis_document_connector
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
